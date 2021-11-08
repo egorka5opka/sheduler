@@ -1,0 +1,50 @@
+from PyQt5 import QtCore, QtWidgets
+
+
+class Ui_Form(object):
+    def setupUi(self, Form):
+        Form.setObjectName("Form")
+        Form.resize(781, 512)
+        self.horizontalLayoutWidget = QtWidgets.QWidget(Form)
+        self.horizontalLayoutWidget.setGeometry(QtCore.QRect(0, 0, 781, 41))
+        self.horizontalLayoutWidget.setObjectName("horizontalLayoutWidget")
+        self.horizontalLayout = QtWidgets.QHBoxLayout(self.horizontalLayoutWidget)
+        self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
+        self.horizontalLayout.setObjectName("horizontalLayout")
+        self.load_btn = QtWidgets.QPushButton(self.horizontalLayoutWidget)
+        self.load_btn.setObjectName("load_btn")
+        self.horizontalLayout.addWidget(self.load_btn)
+        self.delete_btn = QtWidgets.QPushButton(self.horizontalLayoutWidget)
+        self.delete_btn.setObjectName("delete_btn")
+        self.horizontalLayout.addWidget(self.delete_btn)
+        self.update_btn = QtWidgets.QPushButton(self.horizontalLayoutWidget)
+        self.update_btn.setObjectName("update_btn")
+        self.horizontalLayout.addWidget(self.update_btn)
+        self.types = QtWidgets.QComboBox(self.horizontalLayoutWidget)
+        self.types.setMinimumSize(QtCore.QSize(0, 0))
+        self.types.setObjectName("types")
+        self.horizontalLayout.addWidget(self.types)
+        self.label = QtWidgets.QLabel(self.horizontalLayoutWidget)
+        self.label.setMaximumSize(QtCore.QSize(70, 16777215))
+        self.label.setObjectName("label")
+        self.horizontalLayout.addWidget(self.label)
+        self.name_search = QtWidgets.QLineEdit(self.horizontalLayoutWidget)
+        self.name_search.setMaximumSize(QtCore.QSize(160, 16777215))
+        self.name_search.setObjectName("name_search")
+        self.horizontalLayout.addWidget(self.name_search)
+        self.object_list = QtWidgets.QTableWidget(Form)
+        self.object_list.setGeometry(QtCore.QRect(0, 50, 781, 461))
+        self.object_list.setObjectName("object_list")
+        self.object_list.setColumnCount(0)
+        self.object_list.setRowCount(0)
+
+        self.retranslateUi(Form)
+        QtCore.QMetaObject.connectSlotsByName(Form)
+
+    def retranslateUi(self, Form):
+        _translate = QtCore.QCoreApplication.translate
+        Form.setWindowTitle(_translate("Form", "Список объектов"))
+        self.load_btn.setText(_translate("Form", "Загрузить"))
+        self.delete_btn.setText(_translate("Form", "Удалить"))
+        self.update_btn.setText(_translate("Form", "Обновить"))
+        self.label.setText(_translate("Form", "По имени:"))

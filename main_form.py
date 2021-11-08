@@ -1,0 +1,52 @@
+from PyQt5 import QtCore, QtWidgets
+
+
+class Ui_MainWindow(object):
+    def setupUi(self, MainWindow):
+        MainWindow.setObjectName("MainWindow")
+        MainWindow.resize(861, 498)
+        self.centralwidget = QtWidgets.QWidget(MainWindow)
+        self.centralwidget.setObjectName("centralwidget")
+        MainWindow.setCentralWidget(self.centralwidget)
+        self.menubar = QtWidgets.QMenuBar(MainWindow)
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 861, 26))
+        self.menubar.setObjectName("menubar")
+        self.menu = QtWidgets.QMenu(self.menubar)
+        self.menu.setObjectName("menu")
+        self.menu_2 = QtWidgets.QMenu(self.menubar)
+        self.menu_2.setObjectName("menu_2")
+        MainWindow.setMenuBar(self.menubar)
+        self.statusbar = QtWidgets.QStatusBar(MainWindow)
+        self.statusbar.setObjectName("statusbar")
+        MainWindow.setStatusBar(self.statusbar)
+        self.open_btn = QtWidgets.QAction(MainWindow)
+        self.open_btn.setObjectName("open_btn")
+        self.create_btn = QtWidgets.QAction(MainWindow)
+        self.create_btn.setObjectName("create_btn")
+        self.load_btn = QtWidgets.QAction(MainWindow)
+        self.load_btn.setObjectName("load_btn")
+        self.show_list_btn = QtWidgets.QAction(MainWindow)
+        self.show_list_btn.setObjectName("show_list_btn")
+        self.save_btn = QtWidgets.QAction(MainWindow)
+        self.save_btn.setObjectName("save_btn")
+        self.menu.addAction(self.open_btn)
+        self.menu.addAction(self.create_btn)
+        self.menu.addAction(self.save_btn)
+        self.menu_2.addAction(self.load_btn)
+        self.menu_2.addAction(self.show_list_btn)
+        self.menubar.addAction(self.menu.menuAction())
+        self.menubar.addAction(self.menu_2.menuAction())
+
+        self.retranslateUi(MainWindow)
+        QtCore.QMetaObject.connectSlotsByName(MainWindow)
+
+    def retranslateUi(self, MainWindow):
+        _translate = QtCore.QCoreApplication.translate
+        MainWindow.setWindowTitle(_translate("MainWindow", "Планировщик"))
+        self.menu.setTitle(_translate("MainWindow", "Файл"))
+        self.menu_2.setTitle(_translate("MainWindow", "Объект"))
+        self.open_btn.setText(_translate("MainWindow", "Открыть"))
+        self.create_btn.setText(_translate("MainWindow", "Создать"))
+        self.load_btn.setText(_translate("MainWindow", "Загрузить"))
+        self.show_list_btn.setText(_translate("MainWindow", "Посмотреть список"))
+        self.save_btn.setText(_translate("MainWindow", "Сохранить"))

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>861</width>
+    <height>498</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget"/>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>861</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menu">
+    <property name="title">
+     <string>Файл</string>
+    </property>
+    <addaction name="open_btn"/>
+    <addaction name="create_btn"/>
+    <addaction name="save_btn"/>
+   </widget>
+   <widget class="QMenu" name="menu_2">
+    <property name="title">
+     <string>Объект</string>
+    </property>
+    <addaction name="load_btn"/>
+    <addaction name="show_list_btn"/>
+   </widget>
+   <addaction name="menu"/>
+   <addaction name="menu_2"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="open_btn">
+   <property name="text">
+    <string>Открыть</string>
+   </property>
+  </action>
+  <action name="create_btn">
+   <property name="text">
+    <string>Создать</string>
+   </property>
+  </action>
+  <action name="load_btn">
+   <property name="text">
+    <string>Загрузить</string>
+   </property>
+  </action>
+  <action name="show_list_btn">
+   <property name="text">
+    <string>Посмотреть список</string>
+   </property>
+  </action>
+  <action name="save_btn">
+   <property name="text">
+    <string>Сохранить</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
