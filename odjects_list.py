@@ -6,11 +6,7 @@ from PIL import Image, ImageQt
 from showing_form import Ui_Form
 from loading import LoadWidget
 import sqlite3
-
-
-LIST_HEADERS = ["Изображение", "Название", "Тип"]
-WIDTH_HEADERS = [75, 25]
-IMG_SIZE = 150
+from constants import LIST_HEADERS, WIDTH_HEADERS, SHOWING_LIST_IMAGE_SIZE as IMG_SIZE
 
 
 class ObjectList(QMainWindow, Ui_Form):
@@ -39,8 +35,7 @@ class ObjectList(QMainWindow, Ui_Form):
         self.delete_btn.setToolTip("Delete")
 
         db_cursor = self.connection.cursor()
-        types = db_cursor.execute("SELECT type FROM types")
-        self.types.clear()
+        types = db_cursor.execute("SELECT type FROM types ORDER BY type").fetchall()
         self.types.addItem("Все")
         for t in types:
             self.types.addItem(t[0])

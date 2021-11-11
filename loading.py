@@ -8,28 +8,25 @@ from PyQt5.QtWidgets import QPushButton
 from PIL import Image
 from PIL.ImageQt import ImageQt
 import sqlite3
-
-SCREEN_SIZE = [480, 330]
-IMAGE_SIZE = [250, 250]
-NEW_TYPE = "Новый тип"
+from constants import NEW_TYPE, LOAD_SCREEN_SIZE, LOAD_IMAGE_SIZE
 
 
 class LoadWidget(QWidget):
-    def __init__(self, types):
+    def __init__(self, types=None):
         super().__init__()
         self.init_ui()
         self.im = None
         self.parent_form_types = types
 
     def init_ui(self):
-        self.setGeometry(400, 400, *SCREEN_SIZE)
+        self.setGeometry(400, 400, *LOAD_SCREEN_SIZE)
         self.setWindowTitle('Создание объекта')
         self.setMinimumSize(self.size())
         self.setMaximumSize(self.size())
 
         self.image_lbl = QLabel(self)
         self.image_lbl.move(10, 10)
-        self.image_lbl.resize(*IMAGE_SIZE)
+        self.image_lbl.resize(*LOAD_IMAGE_SIZE)
 
         self.load_btn = QPushButton("Загрузить", self)
         self.load_btn.setGeometry(270, 10, 200, 30)
@@ -89,13 +86,18 @@ class LoadWidget(QWidget):
         if type == NEW_TYPE:
             type = self.type_edit.text().lower().strip()
             type = type[0].upper() + type[1:]
-            self.parent_form_types.addItem(type)
+            if self.parent_form_types:
+                self.parent_form_types.addItem(type)
+        elif type == "Все" or type == NEW_TYPE:
+            self.status_lbl.setText("Недопустимое название типа")
+            return
         connection = sqlite3.connect("objects_db.db")
         cursor = connection.cursor()
         have_type = cursor.execute(f"SELECT id FROM types where type == '{type}'").fetchone()
         if not have_type:
             cursor.execute(f"INSERT INTO types (type) VALUES ('{type}')")
             have_type = cursor.execute(f"SELECT id FROM types where type == '{type}'").fetchone()
+
         type_id = have_type[0]
         same = cursor.execute(f"SELECT id FROM objects WHERE name == '{name}' AND type == '{type_id}'").fetchone()
         if same:
@@ -116,6 +118,7 @@ class LoadWidget(QWidget):
         self.close()
 
     def keyPressEvent(self, event):
+        print("pressed")
         if event.key() == Qt.Key_Return or event.key() == Qt.Key_Enter:
             self.save_object()
 

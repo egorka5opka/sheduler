@@ -6,20 +6,164 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>861</width>
-    <height>498</height>
+    <width>1056</width>
+    <height>681</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Планировщик</string>
   </property>
-  <widget class="QWidget" name="centralwidget"/>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QWidget" name="verticalLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>311</width>
+      <height>631</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="vertical_menu">
+     <property name="spacing">
+      <number>3</number>
+     </property>
+     <item>
+      <widget class="QComboBox" name="types">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>30</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="name_search">
+       <property name="readOnly">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QTableWidget" name="obj_list">
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="horizontalLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>310</x>
+      <y>0</y>
+      <width>441</width>
+      <height>32</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontal_menu">
+     <property name="spacing">
+      <number>1</number>
+     </property>
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="minimumSize">
+        <size>
+         <width>55</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>55</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>Ширина:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QSpinBox" name="width_edit">
+       <property name="maximumSize">
+        <size>
+         <width>70</width>
+         <height>16777215</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_2">
+       <property name="minimumSize">
+        <size>
+         <width>55</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>50</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>Высота:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QSpinBox" name="height_edit">
+       <property name="maximumSize">
+        <size>
+         <width>70</width>
+         <height>16777215</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="mode_btn">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>30</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>Текстовый режим</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QTableWidget" name="flowerbed">
+    <property name="geometry">
+     <rect>
+      <x>310</x>
+      <y>30</y>
+      <width>741</width>
+      <height>601</height>
+     </rect>
+    </property>
+   </widget>
+  </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>861</width>
+     <width>1056</width>
      <height>26</height>
     </rect>
    </property>
@@ -27,44 +171,50 @@
     <property name="title">
      <string>Файл</string>
     </property>
-    <addaction name="open_btn"/>
-    <addaction name="create_btn"/>
-    <addaction name="save_btn"/>
+    <addaction name="open_action"/>
+    <addaction name="create_action"/>
+    <addaction name="save_action"/>
+    <addaction name="save_as_action"/>
    </widget>
    <widget class="QMenu" name="menu_2">
     <property name="title">
      <string>Объект</string>
     </property>
-    <addaction name="load_btn"/>
-    <addaction name="show_list_btn"/>
+    <addaction name="load_action"/>
+    <addaction name="show_list_action"/>
    </widget>
    <addaction name="menu"/>
    <addaction name="menu_2"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <action name="open_btn">
+  <action name="open_action">
    <property name="text">
-    <string>Открыть</string>
+    <string>Открыть (Ctrl + O)</string>
    </property>
   </action>
-  <action name="create_btn">
+  <action name="create_action">
    <property name="text">
-    <string>Создать</string>
+    <string>Создать (Ctrl+N)</string>
    </property>
   </action>
-  <action name="load_btn">
+  <action name="load_action">
    <property name="text">
-    <string>Загрузить</string>
+    <string>Загрузить (Ctrl+U)</string>
    </property>
   </action>
-  <action name="show_list_btn">
+  <action name="show_list_action">
    <property name="text">
     <string>Посмотреть список</string>
    </property>
   </action>
-  <action name="save_btn">
+  <action name="save_action">
    <property name="text">
-    <string>Сохранить</string>
+    <string>Сохранить (Ctrl+S)</string>
+   </property>
+  </action>
+  <action name="save_as_action">
+   <property name="text">
+    <string>Сохранить как (Ctrl+Shift+S)</string>
    </property>
   </action>
  </widget>
