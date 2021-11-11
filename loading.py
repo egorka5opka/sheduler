@@ -12,11 +12,11 @@ from constants import NEW_TYPE, LOAD_SCREEN_SIZE, LOAD_IMAGE_SIZE
 
 
 class LoadWidget(QWidget):
-    def __init__(self, types=None):
+    def __init__(self, parents=[None]):
         super().__init__()
         self.init_ui()
         self.im = None
-        self.parent_form_types = types
+        self.parents = parents
 
     def init_ui(self):
         self.setGeometry(400, 400, *LOAD_SCREEN_SIZE)
@@ -43,7 +43,7 @@ class LoadWidget(QWidget):
         self.types.setGeometry(270, 130, 200, 30)
         connection = sqlite3.connect("objects_db.db")
         db_cursor = connection.cursor()
-        types = db_cursor.execute("SELECT type FROM types")
+        types = db_cursor.execute("SELECT type FROM types").fetchall()
         self.types.addItem("Новый тип")
         for t in types:
             self.types.addItem(t[0])
@@ -86,8 +86,9 @@ class LoadWidget(QWidget):
         if type == NEW_TYPE:
             type = self.type_edit.text().lower().strip()
             type = type[0].upper() + type[1:]
-            if self.parent_form_types:
-                self.parent_form_types.addItem(type)
+            for p in self.parents:
+                if p:
+                    p.types.addItem(type)
         elif type == "Все" or type == NEW_TYPE:
             self.status_lbl.setText("Недопустимое название типа")
             return
@@ -111,11 +112,14 @@ class LoadWidget(QWidget):
         id = 1
         if idexec[0]:
             id = idexec[0] + 1
-        cursor.execute(f"INSERT INTO objects (id, name, type) VALUES ({id}, '{name}', {type_id})")
+        cursor.execute(f"INSERT INTO objects (id, name, type) VALUES ({id}, '{name}', {type_id})").fetchall()
         connection.commit()
         connection.close()
         self.im.save(f"objects/{id}.png")
         self.close()
+        for p in self.parents:
+            if p:
+                p.update_list()
 
     def keyPressEvent(self, event):
         print("pressed")

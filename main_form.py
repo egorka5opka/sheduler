@@ -44,6 +44,8 @@ class Ui_MainWindow(object):
         self.obj_list.setObjectName("obj_list")
         self.obj_list.setColumnCount(0)
         self.obj_list.setRowCount(0)
+        self.obj_list.horizontalHeader().setVisible(False)
+        self.obj_list.verticalHeader().setVisible(False)
         self.vertical_menu.addWidget(self.obj_list)
         self.horizontalLayoutWidget = QtWidgets.QWidget(self.centralwidget)
         self.horizontalLayoutWidget.setGeometry(QtCore.QRect(310, 0, 441, 32))

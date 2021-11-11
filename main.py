@@ -15,6 +15,7 @@ class Main(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
+        self.showing = None
         self.connection = sqlite3.connect("objects_db.db")
         self.current_type = "Все"
         self.show_list_action.triggered.connect(self.show_object_list)
@@ -49,7 +50,7 @@ class Main(QMainWindow, Ui_MainWindow):
         for t in in_types:
             query = f"SELECT objects.id, objects.name, types.type FROM objects LEFT JOIN types ON" \
                     f" types.id == objects.type WHERE types.type == '{t}' ORDER BY objects.name"
-            result = list(db_cursor.execute(query))
+            result = list(db_cursor.execute(query).fetchall())
             search = self.name_search.text().lower()
             if search:
                 result = filter(lambda e: search in str(e[1]).lower(), result)
@@ -81,16 +82,16 @@ class Main(QMainWindow, Ui_MainWindow):
                 else:
                     vert_headers += ["1"]
             self.obj_list.setColumnWidth(0, IMG_SIZE)
-            left_width = self.verticalLayoutWidget.width() - IMG_SIZE
+            left_width = self.verticalLayoutWidget.width() - IMG_SIZE - 2
             self.obj_list.setColumnWidth(1, left_width)
         self.obj_list.setVerticalHeaderLabels(vert_headers)
 
     def show_object_list(self):
-        self.showing = ObjectList()
+        self.showing = ObjectList(self)
         self.showing.show()
 
     def upload_object(self):
-        self.loading = LoadWidget(self.types)
+        self.loading = LoadWidget([self, self.showing])
         self.loading.show()
 
     def create_flowerbed(self):

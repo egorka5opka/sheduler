@@ -10,8 +10,9 @@ from constants import LIST_HEADERS, WIDTH_HEADERS, SHOWING_LIST_IMAGE_SIZE as IM
 
 
 class ObjectList(QMainWindow, Ui_Form):
-    def __init__(self):
+    def __init__(self, parent_form=None):
         super().__init__()
+        self.parent_form = parent_form
         self.setupUi(self)
         self.setMinimumSize(self.size())
 
@@ -51,18 +52,20 @@ class ObjectList(QMainWindow, Ui_Form):
         self.statusBar().showMessage("")
         count = len(selected)
         accepted = QMessageBox.question(self, "Подтверждение удаления",
-                                        f"Удалить {count} элемент {self.getEnding(count)}?",
+                                        f"Удалить {count} элемент {get_ending(count)}?",
                                         QMessageBox.Yes, QMessageBox.No)
         if accepted == QMessageBox.No:
             return
         db_cursor = self.connection.cursor()
         query = f"DELETE FROM objects WHERE id IN ({', '.join(map(str, selected))})"
-        db_cursor.execute(query)
+        db_cursor.execute(query).fetchall()
         self.connection.commit()
         self.update_list()
+        if self.parent_form:
+            self.parent_form.update_list()
 
     def upload_object(self):
-        self.loading = LoadWidget(self.types)
+        self.loading = LoadWidget([self.parent_form, self])
         self.loading.show()
 
     def update_list(self):
@@ -74,7 +77,7 @@ class ObjectList(QMainWindow, Ui_Form):
         else:
             query = f"SELECT objects.id, objects.name, types.type FROM objects\
              LEFT JOIN types ON objects.type == types.id WHERE types.type == '{self.current_type}'"
-        result = db_cursor.execute(query)
+        result = db_cursor.execute(query).fetchall()
         search = self.name_search.text().lower()
         if search:
             result = filter(lambda e: search in str(e[1]).lower(), result)
@@ -113,12 +116,12 @@ class ObjectList(QMainWindow, Ui_Form):
         for t in types:
             cnt_type = db_cursor.execute(f"SELECT COUNT(id) FROM objects WHERE type == {t[0]}").fetchone()[0]
             if not cnt_type:
-                db_cursor.execute(f"DELETE FROM types WHERE id == {t[0]}")
+                db_cursor.execute(f"DELETE FROM types WHERE id == {t[0]}").fetchall()
         self.connection.commit()
         self.connection.close()
 
 
-def get_ending(self, n):
+def get_ending(n):
     if 10 < n < 20:
         return "ов"
     n %= 10
