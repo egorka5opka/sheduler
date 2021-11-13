@@ -13,10 +13,6 @@ from methods import set_picture_to_table
 
 '''
 PLAN
-обработать изменение размеров тблицы и ячеек        DONE
-реализовать возможность помещать объекты в ячейки   DONE
-удаленеие объектов из ячеек
-сделать текстовое отображение
 реализовать сохранение как
 просто сохранение
 открытие файлов
@@ -35,6 +31,7 @@ class Main(QMainWindow, Ui_MainWindow):
         self.selected_obj = -1
         self.cell_size = self.cell_size_edit.value()
         self.rubber = False
+        self.text_mode = False
 
         self.show_list_action.triggered.connect(self.show_object_list)
         self.load_action.triggered.connect(self.upload_object)
@@ -45,6 +42,7 @@ class Main(QMainWindow, Ui_MainWindow):
         self.setMinimumSize(self.flowerbed.x() + 1, self.flowerbed.y() + 1)
         self.name_search.textEdited.connect(self.update_list)
         self.rubber_btn.clicked.connect(self.rubber_click)
+        self.mode_btn.clicked.connect(self.text_mode_click)
 
         self.rubber_btn.setStyleSheet("background: rgb(255, 255, 255)")
 
@@ -75,8 +73,16 @@ class Main(QMainWindow, Ui_MainWindow):
         if chose == self.selected_obj or self.obj_list.item(chose, 1).data(Qt.UserRole) == TYPE_ROLE:
             self.selected_obj = -1
             return
-        self.obj_list.selectRow(chose)
+        self.obj_list.item(chose, 1).setSelected(True)
         self.selected_obj = chose
+
+    def text_mode_click(self):
+        self.text_mode = not self.text_mode
+        if self.text_mode:
+            self.mode_btn.setText("Режим картинок")
+        else:
+            self.mode_btn.setText("Текстовый режим")
+        self.rebuild_flowerbed()
 
     def choose_cell(self):
         x = self.flowerbed.currentRow()
@@ -87,10 +93,15 @@ class Main(QMainWindow, Ui_MainWindow):
             return
         if self.selected_obj != -1:
             obj = self.obj_list.item(self.selected_obj, 0).data(Qt.UserRole)[1]
+            self.flowerbed.setItem(x, y, None)
             self.set_object(x, y, obj)
 
     def set_object(self, x, y, obj):
         set_picture_to_table(x, y, obj, self.flowerbed, self.cell_size)
+        self.flowerbed.item(x, y).setText("")
+        if self.text_mode:
+            self.flowerbed.item(x, y).setBackground(QBrush())
+            self.flowerbed.item(x, y).setText(self.objects[self.flowerbed.item(x, y).data(Qt.UserRole)[1]])
 
     def rebuild_flowerbed(self):
         width = self.width_edit.value()
@@ -118,6 +129,12 @@ class Main(QMainWindow, Ui_MainWindow):
 
     def update_list(self):
         db_cursor = self.connection.cursor()
+
+        id_and_objects = db_cursor.execute("SELECT id, name from objects").fetchall()
+        self.objects = dict()
+        for i, o in id_and_objects:
+            self.objects[int(i)] = o
+
         self.obj_list.setRowCount(0)
         self.obj_list.clearSelection()
         if self.current_type == "Все":
