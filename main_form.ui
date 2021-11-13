@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1056</width>
-    <height>681</height>
+    <width>1055</width>
+    <height>684</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -75,7 +75,7 @@
      <rect>
       <x>310</x>
       <y>0</y>
-      <width>671</width>
+      <width>741</width>
       <height>32</height>
      </rect>
     </property>
@@ -181,7 +181,7 @@
      <item>
       <widget class="QSlider" name="cell_size_edit">
        <property name="minimum">
-        <number>25</number>
+        <number>30</number>
        </property>
        <property name="maximum">
         <number>200</number>
@@ -213,6 +213,19 @@
        </property>
       </widget>
      </item>
+     <item>
+      <widget class="QPushButton" name="rubber_btn">
+       <property name="maximumSize">
+        <size>
+         <width>70</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>Ластик</string>
+       </property>
+      </widget>
+     </item>
     </layout>
    </widget>
    <widget class="QTableWidget" name="flowerbed">
@@ -234,7 +247,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1056</width>
+     <width>1055</width>
      <height>26</height>
     </rect>
    </property>

@@ -15,6 +15,7 @@ from methods import set_picture_to_table
 PLAN
 обработать изменение размеров тблицы и ячеек        DONE
 реализовать возможность помещать объекты в ячейки   DONE
+удаленеие объектов из ячеек
 сделать текстовое отображение
 реализовать сохранение как
 просто сохранение
@@ -33,6 +34,8 @@ class Main(QMainWindow, Ui_MainWindow):
         self.current_type = "Все"
         self.selected_obj = -1
         self.cell_size = self.cell_size_edit.value()
+        self.rubber = False
+
         self.show_list_action.triggered.connect(self.show_object_list)
         self.load_action.triggered.connect(self.upload_object)
         self.create_action.triggered.connect(self.create_flowerbed)
@@ -41,6 +44,9 @@ class Main(QMainWindow, Ui_MainWindow):
         self.save_as_action.triggered.connect(self.save_flowerbed_as)
         self.setMinimumSize(self.flowerbed.x() + 1, self.flowerbed.y() + 1)
         self.name_search.textEdited.connect(self.update_list)
+        self.rubber_btn.clicked.connect(self.rubber_click)
+
+        self.rubber_btn.setStyleSheet("background: rgb(255, 255, 255)")
 
         self.obj_list.setColumnCount(len(LIST_HEADERS_MAIN))
         self.obj_list.setHorizontalHeaderLabels(LIST_HEADERS_MAIN)
@@ -62,6 +68,8 @@ class Main(QMainWindow, Ui_MainWindow):
         self.create_flowerbed()
 
     def choose_object(self):
+        if self.rubber:
+            self.rubber_click()
         chose = self.obj_list.currentRow()
         self.obj_list.clearSelection()
         if chose == self.selected_obj or self.obj_list.item(chose, 1).data(Qt.UserRole) == TYPE_ROLE:
@@ -74,6 +82,9 @@ class Main(QMainWindow, Ui_MainWindow):
         x = self.flowerbed.currentRow()
         y = self.flowerbed.currentColumn()
         self.flowerbed.clearSelection()
+        if self.rubber:
+            self.flowerbed.setItem(x, y, None)
+            return
         if self.selected_obj != -1:
             obj = self.obj_list.item(self.selected_obj, 0).data(Qt.UserRole)[1]
             self.set_object(x, y, obj)
@@ -97,6 +108,13 @@ class Main(QMainWindow, Ui_MainWindow):
                     continue
                 obj = self.flowerbed.item(i, j).data(Qt.UserRole)[1]
                 self.set_object(i, j, obj)
+
+    def rubber_click(self):
+        self.rubber = not self.rubber
+        if self.rubber:
+            self.rubber_btn.setStyleSheet("background: rgb(230, 100, 100)")
+        else:
+            self.rubber_btn.setStyleSheet("background: rgb(255, 255, 255)")
 
     def update_list(self):
         db_cursor = self.connection.cursor()
