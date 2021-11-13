@@ -45,8 +45,7 @@ class ObjectList(QMainWindow, Ui_Form):
 
     def delete_object(self):
         selected = list(set([i.row() for i in self.object_list.selectedItems()]))
-        selected = [self.object_list.item(i, 0).data(Qt.UserRole) for i in selected]
-        print(selected)
+        selected = [self.object_list.item(i, 0).data(Qt.UserRole)[1] for i in selected]
         if not selected:
             self.statusBar().showMessage("Не выбран ни один объект")
             return
@@ -85,7 +84,6 @@ class ObjectList(QMainWindow, Ui_Form):
         for i, row in enumerate(result):
             self.object_list.setRowCount(i + 1)
             set_picture_to_table(i, 0, row[0], self.object_list, IMG_SIZE)
-            self.object_list.item(i, 0).setData(Qt.UserRole, row[0])
             self.object_list.setItem(i, 1, QTableWidgetItem(row[1]))
             self.object_list.setItem(i, 2, QTableWidgetItem(row[2]))
             self.object_list.setRowHeight(i, IMG_SIZE)

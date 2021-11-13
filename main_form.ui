@@ -181,10 +181,10 @@
      <item>
       <widget class="QSlider" name="cell_size_edit">
        <property name="minimum">
-        <number>10</number>
+        <number>25</number>
        </property>
        <property name="maximum">
-        <number>500</number>
+        <number>200</number>
        </property>
        <property name="singleStep">
         <number>5</number>

@@ -14,7 +14,7 @@ from methods import set_picture_to_table
 '''
 PLAN
 обработать изменение размеров тблицы и ячеек        DONE
-реализовать возможность помещать объекты в ячейки
+реализовать возможность помещать объекты в ячейки   DONE
 сделать текстовое отображение
 реализовать сохранение как
 просто сохранение
@@ -64,7 +64,6 @@ class Main(QMainWindow, Ui_MainWindow):
     def choose_object(self):
         chose = self.obj_list.currentRow()
         self.obj_list.clearSelection()
-        print(chose)
         if chose == self.selected_obj or self.obj_list.item(chose, 1).data(Qt.UserRole) == TYPE_ROLE:
             self.selected_obj = -1
             return
@@ -76,12 +75,11 @@ class Main(QMainWindow, Ui_MainWindow):
         y = self.flowerbed.currentColumn()
         self.flowerbed.clearSelection()
         if self.selected_obj != -1:
-            self.set_object(x, y)
+            obj = self.obj_list.item(self.selected_obj, 0).data(Qt.UserRole)[1]
+            self.set_object(x, y, obj)
 
-    def set_object(self, x, y):
-        set_picture_to_table(x, y, self.obj_list.item(self.selected_obj, 0).data(Qt.UserRole),
-                             self.flowerbed, self.cell_size)
-        self.flowerbed.item(x, y).setData(Qt.UserRole, self.selected_obj)
+    def set_object(self, x, y, obj):
+        set_picture_to_table(x, y, obj, self.flowerbed, self.cell_size)
 
     def rebuild_flowerbed(self):
         width = self.width_edit.value()
@@ -93,9 +91,12 @@ class Main(QMainWindow, Ui_MainWindow):
             self.flowerbed.setColumnWidth(i, self.cell_size)
         for i in range(height):
             self.flowerbed.setRowHeight(i, self.cell_size)
-        for i in range(width):
-            for j in range(height):
-                pass
+        for i in range(height):
+            for j in range(width):
+                if not self.flowerbed.item(i, j):
+                    continue
+                obj = self.flowerbed.item(i, j).data(Qt.UserRole)[1]
+                self.set_object(i, j, obj)
 
     def update_list(self):
         db_cursor = self.connection.cursor()
@@ -131,7 +132,6 @@ class Main(QMainWindow, Ui_MainWindow):
                 i = self.obj_list.rowCount()
                 self.obj_list.setRowCount(i + 1)
                 set_picture_to_table(i, 0, row[0], self.obj_list, IMG_SIZE)
-                self.obj_list.item(i, 0).setData(Qt.UserRole, row[0])
                 self.obj_list.setItem(i, 1, QTableWidgetItem(row[1]))
                 self.obj_list.setRowHeight(i, IMG_SIZE)
                 if vert_headers[-1]:
