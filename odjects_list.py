@@ -7,6 +7,7 @@ from showing_form import Ui_Form
 from loading import LoadWidget
 import sqlite3
 from constants import LIST_HEADERS, WIDTH_HEADERS, SHOWING_LIST_IMAGE_SIZE as IMG_SIZE
+from methods import set_picture_to_table, get_ending
 
 
 class ObjectList(QMainWindow, Ui_Form):
@@ -83,12 +84,8 @@ class ObjectList(QMainWindow, Ui_Form):
             result = filter(lambda e: search in str(e[1]).lower(), result)
         for i, row in enumerate(result):
             self.object_list.setRowCount(i + 1)
-            picture = QTableWidgetItem()
-            img = Image.open(f"objects/{row[0]}.png")
-            img = img.resize((IMG_SIZE, IMG_SIZE))
-            picture.setBackground(QBrush(QPixmap.fromImage(ImageQt.ImageQt(img))))
-            picture.setData(Qt.UserRole, row[0])
-            self.object_list.setItem(i, 0, picture)
+            set_picture_to_table(i, 0, row[0], self.object_list, IMG_SIZE)
+            self.object_list.item(i, 0).setData(Qt.UserRole, row[0])
             self.object_list.setItem(i, 1, QTableWidgetItem(row[1]))
             self.object_list.setItem(i, 2, QTableWidgetItem(row[2]))
             self.object_list.setRowHeight(i, IMG_SIZE)
@@ -116,20 +113,9 @@ class ObjectList(QMainWindow, Ui_Form):
         for t in types:
             cnt_type = db_cursor.execute(f"SELECT COUNT(id) FROM objects WHERE type == {t[0]}").fetchone()[0]
             if not cnt_type:
-                db_cursor.execute(f"DELETE FROM types WHERE id == {t[0]}").fetchall()
+                db_cursor.execute(f"DELETE FROM types WHERE id == {t[0]}")
         self.connection.commit()
         self.connection.close()
-
-
-def get_ending(n):
-    if 10 < n < 20:
-        return "ов"
-    n %= 10
-    if n == 1:
-        return ""
-    if 1 < n < 5:
-        return "а"
-    return "ов"
 
 
 if __name__ == '__main__':

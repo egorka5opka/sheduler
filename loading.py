@@ -112,7 +112,7 @@ class LoadWidget(QWidget):
         id = 1
         if idexec[0]:
             id = idexec[0] + 1
-        cursor.execute(f"INSERT INTO objects (id, name, type) VALUES ({id}, '{name}', {type_id})").fetchall()
+        cursor.execute(f"INSERT INTO objects (id, name, type) VALUES ({id}, '{name}', {type_id})")
         connection.commit()
         connection.close()
         self.im.save(f"objects/{id}.png")
@@ -122,7 +122,6 @@ class LoadWidget(QWidget):
                 p.update_list()
 
     def keyPressEvent(self, event):
-        print("pressed")
         if event.key() == Qt.Key_Return or event.key() == Qt.Key_Enter:
             self.save_object()
 

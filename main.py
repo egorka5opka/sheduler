@@ -1,5 +1,5 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidgetItem
+from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidgetItem, QTableWidget
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QBrush, QPixmap, QColor
 from PIL import Image, ImageQt
@@ -8,7 +8,20 @@ import csv
 from main_form import Ui_MainWindow
 from odjects_list import ObjectList
 from loading import LoadWidget
-from constants import LIST_HEADERS_MAIN, MAIN_SHOWING_IMAGE_SIZE as IMG_SIZE
+from constants import LIST_HEADERS_MAIN, MAIN_SHOWING_IMAGE_SIZE as IMG_SIZE, TYPE_ROLE
+from methods import set_picture_to_table
+
+'''
+PLAN
+обработать изменение размеров тблицы и ячеек        DONE
+реализовать возможность помещать объекты в ячейки
+сделать текстовое отображение
+реализовать сохранение как
+просто сохранение
+открытие файлов
+создание новой клумбы
+конец
+'''
 
 
 class Main(QMainWindow, Ui_MainWindow):
@@ -18,6 +31,8 @@ class Main(QMainWindow, Ui_MainWindow):
         self.showing = None
         self.connection = sqlite3.connect("objects_db.db")
         self.current_type = "Все"
+        self.selected_obj = -1
+        self.cell_size = self.cell_size_edit.value()
         self.show_list_action.triggered.connect(self.show_object_list)
         self.load_action.triggered.connect(self.upload_object)
         self.create_action.triggered.connect(self.create_flowerbed)
@@ -36,11 +51,56 @@ class Main(QMainWindow, Ui_MainWindow):
         for t in types:
             self.types.addItem(t[0])
         self.types.activated[str].connect(self.item_changed)
+
+        self.width_edit.editingFinished.connect(self.rebuild_flowerbed)
+        self.height_edit.editingFinished.connect(self.rebuild_flowerbed)
+        self.cell_size_edit.valueChanged.connect(self.rebuild_flowerbed)
+        self.obj_list.cellClicked.connect(self.choose_object)
+        self.flowerbed.cellClicked.connect(self.choose_cell)
+
         self.update_list()
+        self.create_flowerbed()
+
+    def choose_object(self):
+        chose = self.obj_list.currentRow()
+        self.obj_list.clearSelection()
+        print(chose)
+        if chose == self.selected_obj or self.obj_list.item(chose, 1).data(Qt.UserRole) == TYPE_ROLE:
+            self.selected_obj = -1
+            return
+        self.obj_list.selectRow(chose)
+        self.selected_obj = chose
+
+    def choose_cell(self):
+        x = self.flowerbed.currentRow()
+        y = self.flowerbed.currentColumn()
+        self.flowerbed.clearSelection()
+        if self.selected_obj != -1:
+            self.set_object(x, y)
+
+    def set_object(self, x, y):
+        set_picture_to_table(x, y, self.obj_list.item(self.selected_obj, 0).data(Qt.UserRole),
+                             self.flowerbed, self.cell_size)
+        self.flowerbed.item(x, y).setData(Qt.UserRole, self.selected_obj)
+
+    def rebuild_flowerbed(self):
+        width = self.width_edit.value()
+        height = self.height_edit.value()
+        self.cell_size = self.cell_size_edit.value()
+        self.flowerbed.setColumnCount(width)
+        self.flowerbed.setRowCount(height)
+        for i in range(width):
+            self.flowerbed.setColumnWidth(i, self.cell_size)
+        for i in range(height):
+            self.flowerbed.setRowHeight(i, self.cell_size)
+        for i in range(width):
+            for j in range(height):
+                pass
 
     def update_list(self):
         db_cursor = self.connection.cursor()
         self.obj_list.setRowCount(0)
+        self.obj_list.clearSelection()
         if self.current_type == "Все":
             in_types = db_cursor.execute("SELECT type FROM types ORDER BY type").fetchall()
             in_types = list(map(lambda e: e[0], in_types))
@@ -63,18 +123,15 @@ class Main(QMainWindow, Ui_MainWindow):
             self.obj_list.item(i, 0).setBackground(color)
             type_item = QTableWidgetItem(t)
             type_item.setBackground(color)
+            type_item.setData(Qt.UserRole, TYPE_ROLE)
             self.obj_list.setItem(i, 1, type_item)
             self.obj_list.setRowHeight(i, 30)
             vert_headers += [""]
             for row in result:
                 i = self.obj_list.rowCount()
                 self.obj_list.setRowCount(i + 1)
-                picture = QTableWidgetItem()
-                img = Image.open(f"objects/{row[0]}.png")
-                img = img.resize((IMG_SIZE, IMG_SIZE))
-                picture.setBackground(QBrush(QPixmap.fromImage(ImageQt.ImageQt(img))))
-                picture.setData(Qt.UserRole, row[0])
-                self.obj_list.setItem(i, 0, picture)
+                set_picture_to_table(i, 0, row[0], self.obj_list, IMG_SIZE)
+                self.obj_list.item(i, 0).setData(Qt.UserRole, row[0])
                 self.obj_list.setItem(i, 1, QTableWidgetItem(row[1]))
                 self.obj_list.setRowHeight(i, IMG_SIZE)
                 if vert_headers[-1]:
@@ -95,6 +152,7 @@ class Main(QMainWindow, Ui_MainWindow):
         self.loading.show()
 
     def create_flowerbed(self):
+        self.rebuild_flowerbed()
         print("create")
 
     def open_flowerbed(self):
