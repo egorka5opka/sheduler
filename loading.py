@@ -35,7 +35,7 @@ class LoadWidget(QWidget):
         self.load_btn.setStyleSheet("QPushButton {"
                                     f"border: 2px solid {DARK_MAIN_COLOR};"
                                     "border-radius: 5px;"
-                                    f"background: {INTERACTION_COLOR}"
+                                    f"background: {INTERACTION_COLOR};"
                                     "}")
 
         self.lbl1 = QLabel("Введите название:", self)
@@ -45,7 +45,7 @@ class LoadWidget(QWidget):
         self.name_edit.setStyleSheet("QLineEdit {"
                                      f"border: 2px solid {DARK_MAIN_COLOR};"
                                      "border-radius: 5px;"
-                                     f"background: {INTERACTION_COLOR}"
+                                     f"background: {INTERACTION_COLOR};"
                                      "}")
 
         self.lbl2 = QLabel("Выберите тип (для сортировки): ", self)
@@ -63,10 +63,7 @@ class LoadWidget(QWidget):
         self.types.setStyleSheet("QComboBox {"
                                  f"border: 2px solid {DARK_MAIN_COLOR};"
                                  "border-radius: 5px;"
-                                 f"background-color: {INTERACTION_COLOR}"
-                                 "}"
-                                 "QListView {"
-                                 "background: red"
+                                 f"background-color: {INTERACTION_COLOR};"
                                  "}")
         self.types.setEditable(False)
         self.type = NEW_TYPE
@@ -78,7 +75,7 @@ class LoadWidget(QWidget):
         self.type_edit.setStyleSheet("QLineEdit {"
                                      f"border: 2px solid {DARK_MAIN_COLOR};"
                                      "border-radius: 5px;"
-                                     f"background: {INTERACTION_COLOR}"
+                                     f"background: {INTERACTION_COLOR};"
                                      "}")
 
         self.save_btn = QPushButton("Сохранить", self)
@@ -87,7 +84,7 @@ class LoadWidget(QWidget):
         self.save_btn.setStyleSheet("QPushButton {"
                                     f"border: 2px solid {DARK_MAIN_COLOR};"
                                     "border-radius: 5px;"
-                                    f"background: {INTERACTION_COLOR}"
+                                    f"background: {INTERACTION_COLOR};"
                                     "}")
         self.status_lbl = QLabel(self)
         self.status_lbl.setGeometry(270, 260, 200, 20)

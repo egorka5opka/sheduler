@@ -99,6 +99,7 @@ class Ui_MainWindow(object):
         self.mode_btn.setObjectName("mode_btn")
         self.horizontal_menu.addWidget(self.mode_btn)
         self.rubber_btn = QtWidgets.QPushButton(self.horizontalLayoutWidget)
+        self.rubber_btn.setMinimumSize(QtCore.QSize(0, 30))
         self.rubber_btn.setMaximumSize(QtCore.QSize(70, 16777215))
         self.rubber_btn.setObjectName("rubber_btn")
         self.horizontal_menu.addWidget(self.rubber_btn)

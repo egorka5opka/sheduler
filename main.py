@@ -8,7 +8,7 @@ from main_form import Ui_MainWindow
 from odjects_list import ObjectList
 from loading import LoadWidget
 from constants import LIST_HEADERS_MAIN, MAIN_SHOWING_IMAGE_SIZE as IMG_SIZE, TYPE_ROLE, FLOWERBED_FILE,\
-    MAIN_COLOR, EXTRA_COLOR, INTERACTION_COLOR, SELECTION_COLOR, BTN_CLICKED_COLOR, DARK_MAIN_COLOR
+    MAIN_COLOR, EXTRA_COLOR, INTERACTION_COLOR, SELECTION_COLOR, BTN_CLICKED_COLOR, DARK_MAIN_COLOR, LIGHT_MAIN_COLOR
 from methods import set_picture_to_table
 
 
@@ -42,22 +42,6 @@ class Main(QMainWindow, Ui_MainWindow):
         self.obj_list.setColumnCount(len(LIST_HEADERS_MAIN))
         self.obj_list.setHorizontalHeaderLabels(LIST_HEADERS_MAIN)
 
-        self.flowerbed.setStyleSheet("background: " + MAIN_COLOR)
-        self.menubar.setStyleSheet("background: " + EXTRA_COLOR)
-        self.rubber_btn.setStyleSheet("background: " + INTERACTION_COLOR)
-        self.mode_btn.setStyleSheet("QPushButton {"
-                                    f"border: 2px solid {DARK_MAIN_COLOR};"
-                                    "border-radius: 5px;"
-                                    f"background: {INTERACTION_COLOR}"
-                                    "}")
-        self.width_edit.setStyleSheet("background: " + INTERACTION_COLOR)
-        self.height_edit.setStyleSheet("background: " + INTERACTION_COLOR)
-        self.cell_size_edit.setStyleSheet("slider-color:" + INTERACTION_COLOR)
-        self.types.setEditable(True)
-        self.types.setStyleSheet(f"background: {INTERACTION_COLOR};"
-                                 f"QListView::background: {INTERACTION_COLOR};")
-        self.types.setEditable(False)
-
         db_cursor = self.connection.cursor()
         types = db_cursor.execute("SELECT type FROM types ORDER BY type").fetchall()
         self.types.addItem("Все")
@@ -73,6 +57,52 @@ class Main(QMainWindow, Ui_MainWindow):
 
         self.update_list()
         self.create_flowerbed()
+        self.customize_elements()
+
+    def customize_elements(self):
+        self.flowerbed.setStyleSheet("background: " + MAIN_COLOR)
+        self.menubar.setStyleSheet("background: " + EXTRA_COLOR)
+        self.mode_btn.setStyleSheet("QPushButton {"
+                                        f"border: 2px solid {DARK_MAIN_COLOR};"
+                                        "border-radius: 5px;"
+                                        f"background: {INTERACTION_COLOR};"
+                                        "padding: 1px 5px 1px 5px"
+                                    "}")
+        self.width_edit.setStyleSheet("background: " + INTERACTION_COLOR)
+        self.height_edit.setStyleSheet("background: " + INTERACTION_COLOR)
+        groove_background = f"qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 {LIGHT_MAIN_COLOR}," \
+                            f" stop:1 {DARK_MAIN_COLOR})"
+        self.cell_size_edit.setStyleSheet("QSlider::groove:horizontal {"
+                                          f"border: 1px solid {DARK_MAIN_COLOR};"
+                                          "height: 8px;"
+                                          f"background: {groove_background};"
+                                          "margin: 2px 0;"
+                                          "}"
+                                          "QSlider::handle:horizontal {"
+                                          f"background: {INTERACTION_COLOR};"
+                                          f"border: 1px solid {DARK_MAIN_COLOR};"
+                                          "width: 18px;"
+                                          "margin: -3px 3;"
+                                          "border-radius: 3px;"
+                                          "}")
+        self.types.setEditable(True)
+        self.types.setStyleSheet("QComboBox {"
+                                 f"border: 2px solid {DARK_MAIN_COLOR};"
+                                 "border-radius: 5px;"
+                                 f"background-color: {INTERACTION_COLOR};"
+                                 "}")
+        self.types.setEditable(False)
+        self.name_search.setStyleSheet("QLineEdit {"
+                                       f"border: 2px solid {DARK_MAIN_COLOR};"
+                                       "border-radius: 5px;"
+                                       f"background: {INTERACTION_COLOR};"
+                                       "}")
+        self.rubber_btn.setStyleSheet("QPushButton {"
+                                          f"border: 2px solid {DARK_MAIN_COLOR};"
+                                          "border-radius: 5px;"
+                                          f"background: {INTERACTION_COLOR};"
+                                          "padding: 1px 5px 1px 5px"
+                                      "}")
 
     def choose_object(self):
         if self.rubber:
@@ -96,15 +126,17 @@ class Main(QMainWindow, Ui_MainWindow):
         self.text_mode = not self.text_mode
         if self.text_mode:
             self.mode_btn.setStyleSheet("QPushButton {"
-                                        f"border: 2px solid {DARK_MAIN_COLOR};"
-                                        "border-radius: 5px;"
-                                        f"background: {BTN_CLICKED_COLOR}"
+                                            f"border: 2px solid {DARK_MAIN_COLOR};"
+                                            "border-radius: 5px;"
+                                            f"background: {BTN_CLICKED_COLOR};"
+                                            "padding: 1px 5px 1px 5px"
                                         "}")
         else:
             self.mode_btn.setStyleSheet("QPushButton {"
-                                        f"border: 2px solid {DARK_MAIN_COLOR};"
-                                        "border-radius: 5px;"
-                                        f"background: {INTERACTION_COLOR}"
+                                            f"border: 2px solid {DARK_MAIN_COLOR};"
+                                            "border-radius: 5px;"
+                                            f"background: {INTERACTION_COLOR};"
+                                            "padding: 1px 5px 1px 5px"
                                         "}")
         self.rebuild_flowerbed()
 
@@ -148,9 +180,19 @@ class Main(QMainWindow, Ui_MainWindow):
     def rubber_click(self):
         self.rubber = not self.rubber
         if self.rubber:
-            self.rubber_btn.setStyleSheet("background: " + BTN_CLICKED_COLOR)
+            self.rubber_btn.setStyleSheet("QPushButton {"
+                                          f"border: 2px solid {DARK_MAIN_COLOR};"
+                                          "border-radius: 5px;"
+                                          f"background: {BTN_CLICKED_COLOR};"
+                                          "padding: 1px 5px 1px 5px"
+                                          "}")
         else:
-            self.rubber_btn.setStyleSheet("background: " + INTERACTION_COLOR)
+            self.rubber_btn.setStyleSheet("QPushButton {"
+                                          f"border: 2px solid {DARK_MAIN_COLOR};"
+                                          "border-radius: 5px;"
+                                          f"background: {INTERACTION_COLOR};"
+                                          "padding: 1px 5px 1px 5px"
+                                          "}")
 
     def update_list(self):
         db_cursor = self.connection.cursor()

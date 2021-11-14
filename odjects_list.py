@@ -1,8 +1,6 @@
 import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidgetItem, QLabel, QMessageBox
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QPixmap, QBrush
-from PIL import Image, ImageQt
 from showing_form import Ui_Form
 from loading import LoadWidget
 import sqlite3
