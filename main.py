@@ -1,14 +1,14 @@
 import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidgetItem, QFileDialog, QMessageBox
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QBrush, QPixmap, QColor
-from PIL import Image, ImageQt
+from PyQt5.QtGui import QBrush, QColor
 import sqlite3
 import csv
 from main_form import Ui_MainWindow
 from odjects_list import ObjectList
 from loading import LoadWidget
-from constants import LIST_HEADERS_MAIN, MAIN_SHOWING_IMAGE_SIZE as IMG_SIZE, TYPE_ROLE, FLOWERBED_FILE
+from constants import LIST_HEADERS_MAIN, MAIN_SHOWING_IMAGE_SIZE as IMG_SIZE, TYPE_ROLE, FLOWERBED_FILE,\
+    MAIN_COLOR, EXTRA_COLOR, BTN_COLOR, SELECTION_COLOR, BTN_CLICKED_COLOR
 from methods import set_picture_to_table
 
 
@@ -16,6 +16,8 @@ class Main(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
+        self.setStyleSheet(f"background: {MAIN_COLOR}")
+
         self.showing = None
         self.connection = sqlite3.connect("objects_db.db")
         self.current_type = "Все"
@@ -37,10 +39,16 @@ class Main(QMainWindow, Ui_MainWindow):
         self.rubber_btn.clicked.connect(self.rubber_click)
         self.mode_btn.clicked.connect(self.text_mode_click)
 
-        self.rubber_btn.setStyleSheet("background: rgb(255, 255, 255)")
-
         self.obj_list.setColumnCount(len(LIST_HEADERS_MAIN))
         self.obj_list.setHorizontalHeaderLabels(LIST_HEADERS_MAIN)
+
+        self.flowerbed.setStyleSheet("background: " + MAIN_COLOR)
+        self.menubar.setStyleSheet("background: " + EXTRA_COLOR)
+        self.rubber_btn.setStyleSheet("background: " + BTN_COLOR)
+        self.mode_btn.setStyleSheet("background: " + BTN_COLOR)
+        self.width_edit.setStyleSheet("background: " + BTN_COLOR)
+        self.height_edit.setStyleSheet("background: " + BTN_COLOR)
+        self.cell_size_edit.setStyleSheet("slider-color:" + BTN_COLOR)
 
         db_cursor = self.connection.cursor()
         types = db_cursor.execute("SELECT type FROM types ORDER BY type").fetchall()
@@ -48,6 +56,12 @@ class Main(QMainWindow, Ui_MainWindow):
         for t in types:
             self.types.addItem(t[0])
         self.types.activated[str].connect(self.item_changed)
+        self.types.setEditable(True)
+        self.types.setStyleSheet(f"background: {BTN_COLOR};"
+                                 "QListView"
+                                 "{"
+                                 f"background-color: {BTN_COLOR};"
+                                 "}")
 
         self.width_edit.editingFinished.connect(self.rebuild_flowerbed)
         self.height_edit.editingFinished.connect(self.rebuild_flowerbed)
@@ -62,19 +76,26 @@ class Main(QMainWindow, Ui_MainWindow):
         if self.rubber:
             self.rubber_click()
         chose = self.obj_list.currentRow()
-        self.obj_list.clearSelection()
-        if chose == self.selected_obj or self.obj_list.item(chose, 1).data(Qt.UserRole) == TYPE_ROLE:
+        if chose == self.selected_obj:
+            self.obj_list.item(chose, 1).setBackground(QColor(MAIN_COLOR))
             self.selected_obj = -1
             return
-        self.obj_list.item(chose, 1).setSelected(True)
+        if self.obj_list.item(chose, 1).data(Qt.UserRole) == TYPE_ROLE:
+            if self.selected_obj != -1:
+                self.obj_list.item(self.selected_obj, 1).setBackground(QColor(MAIN_COLOR))
+            self.selected_obj = -1
+            return
+        self.obj_list.item(chose, 1).setBackground(QColor(SELECTION_COLOR))
+        if self.selected_obj != -1:
+            self.obj_list.item(self.selected_obj, 1).setBackground(QColor(MAIN_COLOR))
         self.selected_obj = chose
 
     def text_mode_click(self):
         self.text_mode = not self.text_mode
         if self.text_mode:
-            self.mode_btn.setText("Режим картинок")
+            self.mode_btn.setStyleSheet("background: " + BTN_CLICKED_COLOR)
         else:
-            self.mode_btn.setText("Текстовый режим")
+            self.mode_btn.setStyleSheet("background: " + BTN_COLOR)
         self.rebuild_flowerbed()
 
     def choose_cell(self):
@@ -117,9 +138,9 @@ class Main(QMainWindow, Ui_MainWindow):
     def rubber_click(self):
         self.rubber = not self.rubber
         if self.rubber:
-            self.rubber_btn.setStyleSheet("background: rgb(230, 100, 100)")
+            self.rubber_btn.setStyleSheet("background: " + BTN_CLICKED_COLOR)
         else:
-            self.rubber_btn.setStyleSheet("background: rgb(255, 255, 255)")
+            self.rubber_btn.setStyleSheet("background: " + BTN_COLOR)
 
     def update_list(self):
         db_cursor = self.connection.cursor()
@@ -148,7 +169,7 @@ class Main(QMainWindow, Ui_MainWindow):
                 continue
             i = self.obj_list.rowCount()
             self.obj_list.setRowCount(i + 1)
-            color = QColor(111, 111, 111, 111)
+            color = QColor(EXTRA_COLOR)
             self.obj_list.setItem(i, 0, QTableWidgetItem())
             self.obj_list.item(i, 0).setBackground(color)
             type_item = QTableWidgetItem(t)

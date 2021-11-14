@@ -57,8 +57,14 @@
          <pointsize>8</pointsize>
         </font>
        </property>
+       <property name="editTriggers">
+        <set>QAbstractItemView::NoEditTriggers</set>
+       </property>
        <property name="dragEnabled">
         <bool>true</bool>
+       </property>
+       <property name="selectionMode">
+        <enum>QAbstractItemView::NoSelection</enum>
        </property>
        <attribute name="horizontalHeaderVisible">
         <bool>false</bool>
@@ -237,11 +243,23 @@
       <height>601</height>
      </rect>
     </property>
+    <property name="editTriggers">
+     <set>QAbstractItemView::NoEditTriggers</set>
+    </property>
     <property name="dragEnabled">
      <bool>true</bool>
     </property>
+    <property name="selectionMode">
+     <enum>QAbstractItemView::NoSelection</enum>
+    </property>
+    <attribute name="horizontalHeaderVisible">
+     <bool>false</bool>
+    </attribute>
     <attribute name="horizontalHeaderMinimumSectionSize">
      <number>35</number>
+    </attribute>
+    <attribute name="verticalHeaderVisible">
+     <bool>false</bool>
     </attribute>
     <attribute name="verticalHeaderMinimumSectionSize">
      <number>35</number>

@@ -88,6 +88,9 @@
      <height>461</height>
     </rect>
    </property>
+   <property name="editTriggers">
+    <set>QAbstractItemView::NoEditTriggers</set>
+   </property>
   </widget>
  </widget>
  <resources/>
