@@ -8,7 +8,7 @@ from main_form import Ui_MainWindow
 from odjects_list import ObjectList
 from loading import LoadWidget
 from constants import LIST_HEADERS_MAIN, MAIN_SHOWING_IMAGE_SIZE as IMG_SIZE, TYPE_ROLE, FLOWERBED_FILE,\
-    MAIN_COLOR, EXTRA_COLOR, BTN_COLOR, SELECTION_COLOR, BTN_CLICKED_COLOR
+    MAIN_COLOR, EXTRA_COLOR, INTERACTION_COLOR, SELECTION_COLOR, BTN_CLICKED_COLOR, DARK_MAIN_COLOR
 from methods import set_picture_to_table
 
 
@@ -44,11 +44,19 @@ class Main(QMainWindow, Ui_MainWindow):
 
         self.flowerbed.setStyleSheet("background: " + MAIN_COLOR)
         self.menubar.setStyleSheet("background: " + EXTRA_COLOR)
-        self.rubber_btn.setStyleSheet("background: " + BTN_COLOR)
-        self.mode_btn.setStyleSheet("background: " + BTN_COLOR)
-        self.width_edit.setStyleSheet("background: " + BTN_COLOR)
-        self.height_edit.setStyleSheet("background: " + BTN_COLOR)
-        self.cell_size_edit.setStyleSheet("slider-color:" + BTN_COLOR)
+        self.rubber_btn.setStyleSheet("background: " + INTERACTION_COLOR)
+        self.mode_btn.setStyleSheet("QPushButton {"
+                                    f"border: 2px solid {DARK_MAIN_COLOR};"
+                                    "border-radius: 5px;"
+                                    f"background: {INTERACTION_COLOR}"
+                                    "}")
+        self.width_edit.setStyleSheet("background: " + INTERACTION_COLOR)
+        self.height_edit.setStyleSheet("background: " + INTERACTION_COLOR)
+        self.cell_size_edit.setStyleSheet("slider-color:" + INTERACTION_COLOR)
+        self.types.setEditable(True)
+        self.types.setStyleSheet(f"background: {INTERACTION_COLOR};"
+                                 f"QListView::background: {INTERACTION_COLOR};")
+        self.types.setEditable(False)
 
         db_cursor = self.connection.cursor()
         types = db_cursor.execute("SELECT type FROM types ORDER BY type").fetchall()
@@ -56,12 +64,6 @@ class Main(QMainWindow, Ui_MainWindow):
         for t in types:
             self.types.addItem(t[0])
         self.types.activated[str].connect(self.item_changed)
-        self.types.setEditable(True)
-        self.types.setStyleSheet(f"background: {BTN_COLOR};"
-                                 "QListView"
-                                 "{"
-                                 f"background-color: {BTN_COLOR};"
-                                 "}")
 
         self.width_edit.editingFinished.connect(self.rebuild_flowerbed)
         self.height_edit.editingFinished.connect(self.rebuild_flowerbed)
@@ -93,9 +95,17 @@ class Main(QMainWindow, Ui_MainWindow):
     def text_mode_click(self):
         self.text_mode = not self.text_mode
         if self.text_mode:
-            self.mode_btn.setStyleSheet("background: " + BTN_CLICKED_COLOR)
+            self.mode_btn.setStyleSheet("QPushButton {"
+                                        f"border: 2px solid {DARK_MAIN_COLOR};"
+                                        "border-radius: 5px;"
+                                        f"background: {BTN_CLICKED_COLOR}"
+                                        "}")
         else:
-            self.mode_btn.setStyleSheet("background: " + BTN_COLOR)
+            self.mode_btn.setStyleSheet("QPushButton {"
+                                        f"border: 2px solid {DARK_MAIN_COLOR};"
+                                        "border-radius: 5px;"
+                                        f"background: {INTERACTION_COLOR}"
+                                        "}")
         self.rebuild_flowerbed()
 
     def choose_cell(self):
@@ -140,7 +150,7 @@ class Main(QMainWindow, Ui_MainWindow):
         if self.rubber:
             self.rubber_btn.setStyleSheet("background: " + BTN_CLICKED_COLOR)
         else:
-            self.rubber_btn.setStyleSheet("background: " + BTN_COLOR)
+            self.rubber_btn.setStyleSheet("background: " + INTERACTION_COLOR)
 
     def update_list(self):
         db_cursor = self.connection.cursor()
