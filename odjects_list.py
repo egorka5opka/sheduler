@@ -52,9 +52,9 @@ class ObjectList(QMainWindow, Ui_Form):
         self.statusBar().showMessage("")
         count = len(selected)
         accepted = QMessageBox.question(self, "Подтверждение удаления",
-                                        f"Удалить {count} элемент {get_ending(count)}?",
+                                        f"Удалить {count} элемент{get_ending(count)}?",
                                         QMessageBox.Yes, QMessageBox.No)
-        if accepted == QMessageBox.No:
+        if accepted != QMessageBox.Yes:
             return
         db_cursor = self.connection.cursor()
         query = f"DELETE FROM objects WHERE id IN ({', '.join(map(str, selected))})"

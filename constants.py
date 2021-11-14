@@ -1,5 +1,6 @@
 LIST_HEADERS = ["Изображение", "Название", "Тип"]
 LIST_HEADERS_MAIN = ["Изо", "Название"]
+FLOWERBED_FILE = "FLWB"
 WIDTH_HEADERS = [75, 25]
 SHOWING_LIST_IMAGE_SIZE = 150
 MAIN_SHOWING_IMAGE_SIZE = 50

@@ -62,7 +62,7 @@ class LoadWidget(QWidget):
         self.status_lbl.setGeometry(270, 260, 200, 20)
 
     def load_picture(self):
-        fname = QFileDialog.getOpenFileName(self, 'Выбрать картинку', '', "JPEG (*.jpg);; PNG (*.png);; BMP (*.bmp)")[0]
+        fname = QFileDialog.getOpenFileName(self, 'Выбрать картинку', '', "")[0]
         if not fname:
             return
         try:

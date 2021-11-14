@@ -181,7 +181,7 @@
      <item>
       <widget class="QSlider" name="cell_size_edit">
        <property name="minimum">
-        <number>30</number>
+        <number>35</number>
        </property>
        <property name="maximum">
         <number>200</number>
@@ -240,6 +240,12 @@
     <property name="dragEnabled">
      <bool>true</bool>
     </property>
+    <attribute name="horizontalHeaderMinimumSectionSize">
+     <number>35</number>
+    </attribute>
+    <attribute name="verticalHeaderMinimumSectionSize">
+     <number>35</number>
+    </attribute>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">

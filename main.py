@@ -1,5 +1,5 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidgetItem, QTableWidget
+from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidgetItem, QFileDialog, QMessageBox
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QBrush, QPixmap, QColor
 from PIL import Image, ImageQt
@@ -8,17 +8,8 @@ import csv
 from main_form import Ui_MainWindow
 from odjects_list import ObjectList
 from loading import LoadWidget
-from constants import LIST_HEADERS_MAIN, MAIN_SHOWING_IMAGE_SIZE as IMG_SIZE, TYPE_ROLE
+from constants import LIST_HEADERS_MAIN, MAIN_SHOWING_IMAGE_SIZE as IMG_SIZE, TYPE_ROLE, FLOWERBED_FILE
 from methods import set_picture_to_table
-
-'''
-PLAN
-реализовать сохранение как
-просто сохранение
-открытие файлов
-создание новой клумбы
-конец
-'''
 
 
 class Main(QMainWindow, Ui_MainWindow):
@@ -32,6 +23,8 @@ class Main(QMainWindow, Ui_MainWindow):
         self.cell_size = self.cell_size_edit.value()
         self.rubber = False
         self.text_mode = False
+        self.file_name = None
+        self.saved = True
 
         self.show_list_action.triggered.connect(self.show_object_list)
         self.load_action.triggered.connect(self.upload_object)
@@ -97,6 +90,7 @@ class Main(QMainWindow, Ui_MainWindow):
             self.set_object(x, y, obj)
 
     def set_object(self, x, y, obj):
+        self.saved = False
         set_picture_to_table(x, y, obj, self.flowerbed, self.cell_size)
         self.flowerbed.item(x, y).setText("")
         if self.text_mode:
@@ -186,18 +180,84 @@ class Main(QMainWindow, Ui_MainWindow):
         self.loading = LoadWidget([self, self.showing])
         self.loading.show()
 
+    def ask_for_saving(self):
+        quest = QMessageBox(self)
+        quest.setText("Сохранинть последние изменения?")
+        quest.setWindowTitle("Сохранине")
+        quest.addButton(QMessageBox.Yes)
+        quest.addButton(QMessageBox.No)
+        quest.addButton(QMessageBox.Cancel)
+        return quest.exec()
+
     def create_flowerbed(self):
+        if not self.saved:
+            print("asking")
+            acception = self.ask_for_saving()
+            if acception == QMessageBox.Yes:
+                self.save_flowerbed()
+            elif acception != QMessageBox.No:
+                return -1
+        self.flowerbed.setColumnCount(0)
+        self.flowerbed.setRowCount(0)
         self.rebuild_flowerbed()
-        print("create")
+        self.saved = True
+        self.file_name = None
 
     def open_flowerbed(self):
-        print("open")
+        res = self.create_flowerbed()
+        if res == -1:
+            return
+        self.file_name = QFileDialog.getOpenFileName(self, 'Открытие файла', '', "Клумба (*.fwb)")[0]
+        file = open(self.file_name, "r")
+        reader = csv.reader(file, delimiter=";", quotechar='"')
+        header = reader.__next__()
+        if len(header) != 4 or header[0] != FLOWERBED_FILE:
+            self.statusbar.showMessage("Не удалось открыть файл")
+            return
+        try:
+            h, w, size = map(int, header[1:])
+        except Exception:
+            self.statusbar.showMessage("Не удалось открыть файл")
+            return
+        self.width_edit.setValue(w)
+        self.height_edit.setValue(h)
+        self.cell_size = size
+        self.cell_size_edit.setValue(size)
+        fwb = list(reader)
+        for i in range(h):
+            for j in range(w):
+                if fwb[i][j] != "None":
+                    self.set_object(i, j, int(fwb[i][j]))
+        self.saved = True
+        self.statusbar.showMessage(self.file_name.split("/")[-1])
 
     def save_flowerbed(self):
-        print("save")
+        if not self.file_name:
+            fname, ok_pressed = QFileDialog.getSaveFileName(self, 'Сохранение файла', '', "Клумба (*.fwb)")
+            if not ok_pressed:
+                return
+            self.file_name = fname
+        self.saved = True
+        file = open(self.file_name, "w", newline="")
+        writer = csv.writer(file, delimiter=";", quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        writer.writerow([FLOWERBED_FILE, self.flowerbed.rowCount(), self.flowerbed.columnCount(), self.cell_size])
+        for i in range(self.flowerbed.rowCount()):
+            row = []
+            for j in range(self.flowerbed.columnCount()):
+                if self.flowerbed.item(i, j):
+                    row.append(self.flowerbed.item(i, j).data(Qt.UserRole)[1])
+                else:
+                    row.append("None")
+            writer.writerow(row)
+        file.close()
+        self.statusbar.showMessage(self.file_name.split("/")[-1])
 
     def save_flowerbed_as(self):
-        print("save_as")
+        fname, ok_pressed = QFileDialog.getSaveFileName(self, 'Сохранение файла', '', "Клумба (*.fwb)")
+        if not ok_pressed:
+            return
+        self.file_name = fname
+        self.save_flowerbed()
 
     def item_changed(self, text):
         self.current_type = text
