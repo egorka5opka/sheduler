@@ -59,7 +59,8 @@ class ObjectList(QMainWindow, Ui_Form):
                            "QPushButton {" + interact_css + "}"
                            "QLineEdit {" + interact_css + "}"
                            "QDialog { background: " + MAIN_COLOR + "}"
-                           "QComboBox {" + interact_css + "}")
+                           "QComboBox {" + interact_css + "} " +
+                           get_horizontal_scroll_bar_style() + get_vertical_scroll_bar_style())
         self.object_list.setStyleSheet(f"background: {MAIN_COLOR};"
                                        f"selection-background-color: {SELECTION_COLOR};"
                                        f"gridline-color: {EXTRA_COLOR}")
@@ -68,9 +69,9 @@ class ObjectList(QMainWindow, Ui_Form):
             self.types.setItemData(t, QBrush(QColor(INTERACTION_COLOR)), Qt.BackgroundRole)
 
         self.object_list.horizontalHeader().setStyleSheet(get_header_background(0))
-
-        for t in range(self.types.count()):
-            self.types.setItemData(t, QBrush(QColor(INTERACTION_COLOR)), Qt.BackgroundRole)
+        self.corner_widget = QWidget(self)
+        self.corner_widget.resize(20, 20)
+        self.corner_widget.setStyleSheet(f"background: {DARK_EXTRA_COLOR}")
 
     def delete_object(self):
         selected = list(set([i.row() for i in self.object_list.selectedItems()]))
@@ -128,6 +129,7 @@ class ObjectList(QMainWindow, Ui_Form):
         left_size = self.size().width() - SHOWING_LIST_IMAGE_SIZE - 23
         for i in range(len(WIDTH_HEADERS)):
             self.object_list.setColumnWidth(i + 1, WIDTH_HEADERS[i] * left_size // 100)
+        self.corner_widget.move(self.width() - 21, self.height() - 21)
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_F5:

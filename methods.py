@@ -51,11 +51,76 @@ def get_extra_gradient():
 
 
 def get_header_background(type):
-    x2 = [0, 1]
-    y2 = [1, 0]
+    x2 = [0, 1, 1]
+    y2 = [1, 0, 1]
     return "QHeaderView::section {" + \
         f"""background-color: qlineargradient(x1:0, y1:0, x2:{x2[type]}, y2:{y2[type]}, {get_extra_gradient()});
         color: white;
         padding-left: 4px;
         border: 1px solid {DARK_EXTRA_COLOR};""" + "}"
 
+
+def get_horizontal_scroll_bar_style():
+    return "QScrollBar:horizontal {"\
+                f"""border: 2px solid {DARK_EXTRA_COLOR};
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                 stop: 0 {LIGHT_EXTRA_COLOR}, stop: 1 {DARK_EXTRA_COLOR});
+                height: 20px;
+                margin: 0px 40px 0 0px;"""\
+           "} QScrollBar::handle:horizontal {"\
+                f"""background: qlineargradient(x1:0, y1:0, x2:0, y2:1, {get_extra_gradient()});
+                min-width: 40px;"""\
+           "} QScrollBar::add-line:horizontal {"\
+                f"""background: {EXTRA_COLOR};
+                width: 16px;
+                subcontrol-position: right;
+                subcontrol-origin: margin;
+                border: 2px solid black;"""\
+           "} QScrollBar::sub-line:horizontal {"\
+                f"""background: {EXTRA_COLOR};
+                width: 16px;
+                subcontrol-position: top right;
+                subcontrol-origin: margin;
+                border: 2px solid black;
+                position: absolute;
+                right: 20px;"""\
+           "} QScrollBar:left-arrow:horizontal, QScrollBar::right-arrow:horizontal {"\
+                f"""width: 3px;
+                height: 3px;
+                background: white;"""\
+           "} QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {"\
+                f"background: none;"\
+           "}"
+
+
+def get_vertical_scroll_bar_style():
+    return "QScrollBar:vertical {"\
+                f"""border: 2px solid {DARK_EXTRA_COLOR};
+                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                 stop: 0 {LIGHT_EXTRA_COLOR}, stop: 1 {DARK_EXTRA_COLOR});
+                width: 20px;
+                margin: 40px 0px 0 0px;"""\
+           "} QScrollBar::handle:vertical {"\
+                f"""background: qlineargradient(x1:0, y1:0, x2:1, y2:0, {get_extra_gradient()});
+                min-height: 40px;"""\
+           "} QScrollBar::add-line:vertical {"\
+                f"""background: {EXTRA_COLOR};
+                height: 16px;
+                subcontrol-position: top;
+                subcontrol-origin: margin;
+                border: 2px solid black;
+                position: absolute;
+                top: 20px;"""\
+           "} QScrollBar::sub-line:vertical {"\
+                f"""background: {EXTRA_COLOR};
+                height: 16px;
+                subcontrol-position: top;
+                subcontrol-origin: margin;
+                border: 2px solid black;"""\
+           "} QScrollBar:up-arrow:vertical, QScrollBar::down-arrow:vertical {"\
+                f"""width: 3px;
+                height: 3px;
+                background: white;"""\
+           "} QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {"\
+                f"background: none;"\
+           "}"

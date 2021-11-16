@@ -77,7 +77,8 @@ class Main(QMainWindow, Ui_MainWindow):
                                 "border-radius: 5px"
                            "}"
                            "QDialog { background: " + MAIN_COLOR + "}"
-                           "QComboBox {" + interact_css + "}")
+                           "QComboBox {" + interact_css + "}" +
+                           get_horizontal_scroll_bar_style() + get_vertical_scroll_bar_style())
         self.setWindowIcon(QIcon("customizing/icon.png"))
         self.flowerbed.setStyleSheet(f"background: {MAIN_COLOR};"
                                      f"gridline-color: {EXTRA_COLOR}")
@@ -103,6 +104,16 @@ class Main(QMainWindow, Ui_MainWindow):
                                           "margin: -3px 3;"
                                           "border-radius: 3px;"
                                           "}")
+        self.corner_widget = QWidget(self)
+        self.corner_widget.setStyleSheet(f"""background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+         stop: 0 {LIGHT_EXTRA_COLOR}, stop: 0.85 {DARK_EXTRA_COLOR});""")
+        self.flowerbed.horizontalHeader().setMaximumSize(16777215, 30)
+        self.flowerbed.horizontalHeader().setMinimumSize(0, 30)
+        self.flowerbed.verticalHeader().setMaximumSize(30, 16777215)
+        self.flowerbed.verticalHeader().setMinimumSize(30, 0)
+        self.corner_widget.setGeometry(311, 57,
+                                       self.flowerbed.verticalHeader().width(),
+                                       self.flowerbed.horizontalHeader().height())
 
         for t in range(self.types.count()):
             self.types.setItemData(t, QBrush(QColor(INTERACTION_COLOR)), Qt.BackgroundRole)
