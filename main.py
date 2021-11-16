@@ -1,22 +1,20 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidgetItem, QFileDialog, QMessageBox
+from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox, QWidget
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QBrush, QColor
+from PyQt5.QtGui import QBrush, QColor, QIcon
 import sqlite3
 import csv
 from main_form import Ui_MainWindow
 from odjects_list import ObjectList
 from loading import LoadWidget
-from constants import LIST_HEADERS_MAIN, MAIN_SHOWING_IMAGE_SIZE as IMG_SIZE, TYPE_ROLE, FLOWERBED_FILE,\
-    MAIN_COLOR, EXTRA_COLOR, INTERACTION_COLOR, SELECTION_COLOR, BTN_CLICKED_COLOR, DARK_MAIN_COLOR, LIGHT_MAIN_COLOR
-from methods import set_picture_to_table
+from constants import *
+from methods import *
 
 
 class Main(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
-        self.setStyleSheet(f"background: {MAIN_COLOR}")
 
         self.showing = None
         self.connection = sqlite3.connect("objects_db.db")
@@ -45,8 +43,10 @@ class Main(QMainWindow, Ui_MainWindow):
         db_cursor = self.connection.cursor()
         types = db_cursor.execute("SELECT type FROM types ORDER BY type").fetchall()
         self.types.addItem("Все")
-        for t in types:
-            self.types.addItem(t[0])
+        self.types.setItemData(0, QBrush(QColor(INTERACTION_COLOR)), Qt.BackgroundRole)
+        for t in range(len(types)):
+            self.types.addItem(types[t][0])
+            self.types.setItemData(t + 1, QBrush(QColor(INTERACTION_COLOR)), Qt.BackgroundRole)
         self.types.activated[str].connect(self.item_changed)
 
         self.width_edit.editingFinished.connect(self.rebuild_flowerbed)
@@ -60,16 +60,34 @@ class Main(QMainWindow, Ui_MainWindow):
         self.customize_elements()
 
     def customize_elements(self):
-        self.flowerbed.setStyleSheet("background: " + MAIN_COLOR)
-        self.menubar.setStyleSheet("background: " + EXTRA_COLOR)
-        self.mode_btn.setStyleSheet("QPushButton {"
-                                        f"border: 2px solid {DARK_MAIN_COLOR};"
-                                        "border-radius: 5px;"
-                                        f"background: {INTERACTION_COLOR};"
-                                        "padding: 1px 5px 1px 5px"
-                                    "}")
-        self.width_edit.setStyleSheet("background: " + INTERACTION_COLOR)
-        self.height_edit.setStyleSheet("background: " + INTERACTION_COLOR)
+        interact_css = f"""border: 2px solid {DARK_MAIN_COLOR};
+                        border-radius: 5px;
+                        background: {INTERACTION_COLOR};
+                        padding: 1px 5px 1px 5px;
+                        min-width: 50px;"""
+        self.setStyleSheet("QMainWindow {"
+                                f"background: {MAIN_COLOR};"
+                           "}"
+                           "QPushButton {" + interact_css + "}"
+                           "QLineEdit {" + interact_css + "}"
+                           "QSpinBox {"
+                                f"background: {INTERACTION_COLOR};"
+                                "padding-right: 15px;"
+                                f"border: 3px solid {DARK_MAIN_COLOR};"
+                                "border-radius: 5px"
+                           "}"
+                           "QDialog { background: " + MAIN_COLOR + "}"
+                           "QComboBox {" + interact_css + "}")
+        self.setWindowIcon(QIcon("customizing/icon.png"))
+        self.flowerbed.setStyleSheet(f"background: {MAIN_COLOR};"
+                                     f"gridline-color: {EXTRA_COLOR}")
+        self.flowerbed.horizontalHeader().setStyleSheet(get_header_background(0))
+        self.flowerbed.verticalHeader().setStyleSheet(get_header_background(1))
+
+        self.obj_list.setStyleSheet(f"background: {MAIN_COLOR};"
+                                    f"gridline-color: {EXTRA_COLOR}")
+        self.menubar.setStyleSheet(f"background: qlineargradient(x1:0, y1:0, x2:0, y2:1,"
+                                   f" {get_extra_gradient()}); color: white;")
         groove_background = f"qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 {LIGHT_MAIN_COLOR}," \
                             f" stop:1 {DARK_MAIN_COLOR})"
         self.cell_size_edit.setStyleSheet("QSlider::groove:horizontal {"
@@ -85,24 +103,10 @@ class Main(QMainWindow, Ui_MainWindow):
                                           "margin: -3px 3;"
                                           "border-radius: 3px;"
                                           "}")
-        self.types.setEditable(True)
-        self.types.setStyleSheet("QComboBox {"
-                                 f"border: 2px solid {DARK_MAIN_COLOR};"
-                                 "border-radius: 5px;"
-                                 f"background-color: {INTERACTION_COLOR};"
-                                 "}")
-        self.types.setEditable(False)
-        self.name_search.setStyleSheet("QLineEdit {"
-                                       f"border: 2px solid {DARK_MAIN_COLOR};"
-                                       "border-radius: 5px;"
-                                       f"background: {INTERACTION_COLOR};"
-                                       "}")
-        self.rubber_btn.setStyleSheet("QPushButton {"
-                                          f"border: 2px solid {DARK_MAIN_COLOR};"
-                                          "border-radius: 5px;"
-                                          f"background: {INTERACTION_COLOR};"
-                                          "padding: 1px 5px 1px 5px"
-                                      "}")
+
+        for t in range(self.types.count()):
+            self.types.setItemData(t, QBrush(QColor(INTERACTION_COLOR)), Qt.BackgroundRole)
+        # self.setWindowFlags(Qt.FramelessWindowHint)
 
     def choose_object(self):
         if self.rubber:
@@ -125,19 +129,9 @@ class Main(QMainWindow, Ui_MainWindow):
     def text_mode_click(self):
         self.text_mode = not self.text_mode
         if self.text_mode:
-            self.mode_btn.setStyleSheet("QPushButton {"
-                                            f"border: 2px solid {DARK_MAIN_COLOR};"
-                                            "border-radius: 5px;"
-                                            f"background: {BTN_CLICKED_COLOR};"
-                                            "padding: 1px 5px 1px 5px"
-                                        "}")
+            self.mode_btn.setStyleSheet(f"background: {BTN_CLICKED_COLOR};")
         else:
-            self.mode_btn.setStyleSheet("QPushButton {"
-                                            f"border: 2px solid {DARK_MAIN_COLOR};"
-                                            "border-radius: 5px;"
-                                            f"background: {INTERACTION_COLOR};"
-                                            "padding: 1px 5px 1px 5px"
-                                        "}")
+            self.mode_btn.setStyleSheet(f"background: {INTERACTION_COLOR};")
         self.rebuild_flowerbed()
 
     def choose_cell(self):
@@ -166,6 +160,7 @@ class Main(QMainWindow, Ui_MainWindow):
         self.cell_size = self.cell_size_edit.value()
         self.flowerbed.setColumnCount(width)
         self.flowerbed.setRowCount(height)
+        self.statusbar.showMessage("")
         for i in range(width):
             self.flowerbed.setColumnWidth(i, self.cell_size)
         for i in range(height):
@@ -180,19 +175,9 @@ class Main(QMainWindow, Ui_MainWindow):
     def rubber_click(self):
         self.rubber = not self.rubber
         if self.rubber:
-            self.rubber_btn.setStyleSheet("QPushButton {"
-                                          f"border: 2px solid {DARK_MAIN_COLOR};"
-                                          "border-radius: 5px;"
-                                          f"background: {BTN_CLICKED_COLOR};"
-                                          "padding: 1px 5px 1px 5px"
-                                          "}")
+            self.rubber_btn.setStyleSheet(f"background: {BTN_CLICKED_COLOR};")
         else:
-            self.rubber_btn.setStyleSheet("QPushButton {"
-                                          f"border: 2px solid {DARK_MAIN_COLOR};"
-                                          "border-radius: 5px;"
-                                          f"background: {INTERACTION_COLOR};"
-                                          "padding: 1px 5px 1px 5px"
-                                          "}")
+            self.rubber_btn.setStyleSheet(f"background: {INTERACTION_COLOR};")
 
     def update_list(self):
         db_cursor = self.connection.cursor()
@@ -223,25 +208,27 @@ class Main(QMainWindow, Ui_MainWindow):
             self.obj_list.setRowCount(i + 1)
             color = QColor(EXTRA_COLOR)
             self.obj_list.setItem(i, 0, QTableWidgetItem())
-            self.obj_list.item(i, 0).setBackground(color)
             type_item = QTableWidgetItem(t)
-            type_item.setBackground(color)
+            type_item.setForeground(QBrush(QColor(Qt.white)))
             type_item.setData(Qt.UserRole, TYPE_ROLE)
             self.obj_list.setItem(i, 1, type_item)
             self.obj_list.setRowHeight(i, 30)
+            set_item_extra_background(self.obj_list.item(i, 0), self.obj_list.rowHeight(i))
+            set_item_extra_background(self.obj_list.item(i, 1), self.obj_list.rowHeight(i))
             vert_headers += [""]
             for row in result:
                 i = self.obj_list.rowCount()
                 self.obj_list.setRowCount(i + 1)
-                set_picture_to_table(i, 0, row[0], self.obj_list, IMG_SIZE)
+                set_picture_to_table(i, 0, row[0], self.obj_list, MAIN_SHOWING_IMAGE_SIZE)
                 self.obj_list.setItem(i, 1, QTableWidgetItem(row[1]))
-                self.obj_list.setRowHeight(i, IMG_SIZE)
+                set_item_background(self.obj_list.item(i, 1), MAIN_SHOWING_IMAGE_SIZE)
+                self.obj_list.setRowHeight(i, MAIN_SHOWING_IMAGE_SIZE)
                 if vert_headers[-1]:
                     vert_headers += [str(int(vert_headers[-1]) + 1)]
                 else:
                     vert_headers += ["1"]
-            self.obj_list.setColumnWidth(0, IMG_SIZE)
-            left_width = self.verticalLayoutWidget.width() - IMG_SIZE - 2
+            self.obj_list.setColumnWidth(0, MAIN_SHOWING_IMAGE_SIZE)
+            left_width = self.verticalLayoutWidget.width() - MAIN_SHOWING_IMAGE_SIZE - 2
             self.obj_list.setColumnWidth(1, left_width)
         self.obj_list.setVerticalHeaderLabels(vert_headers)
 
@@ -351,10 +338,22 @@ class Main(QMainWindow, Ui_MainWindow):
                 self.save_flowerbed_as()
 
     def resizeEvent(self, event):
-        self.flowerbed.resize(self.centralwidget.width() - self.flowerbed.x() + 1,
-                              self.centralWidget().height() - self.flowerbed.y() + 1)
+        self.flowerbed.resize(self.centralwidget.width() - self.flowerbed.x(),
+                              self.centralWidget().height() - self.flowerbed.y() - 4)
         self.verticalLayoutWidget.resize(self.verticalLayoutWidget.width(),
-                                         self.centralWidget().height() - self.verticalLayoutWidget.y() + 1)
+                                         self.centralWidget().height() - self.verticalLayoutWidget.y() - 4)
+
+    def closeEvent(self, event):
+        self.connection.close()
+        if not self.saved:
+            do_save = self.ask_for_saving()
+            if do_save == QMessageBox.Yes:
+                self.save_flowerbed()
+                event.accept()
+            elif do_save == QMessageBox.No:
+                event.accept()
+            else:
+                event.ignore()
 
 
 if __name__ == '__main__':

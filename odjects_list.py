@@ -1,11 +1,12 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidgetItem, QLabel, QMessageBox
+from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidgetItem, QLabel, QMessageBox, QWidget
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QBrush, QColor, QLinearGradient
 from showing_form import Ui_Form
 from loading import LoadWidget
 import sqlite3
-from constants import LIST_HEADERS, WIDTH_HEADERS, SHOWING_LIST_IMAGE_SIZE as IMG_SIZE
-from methods import set_picture_to_table, get_ending
+from constants import *
+from methods import *
 
 
 class ObjectList(QMainWindow, Ui_Form):
@@ -33,13 +34,43 @@ class ObjectList(QMainWindow, Ui_Form):
 
         self.delete_btn.clicked.connect(self.delete_object)
         self.delete_btn.setToolTip("Delete")
+        self.name_search.textEdited.connect(self.update_list)
 
         db_cursor = self.connection.cursor()
         types = db_cursor.execute("SELECT type FROM types ORDER BY type").fetchall()
         self.types.addItem("Все")
-        for t in types:
-            self.types.addItem(t[0])
+        self.types.setItemData(0, QBrush(QColor(INTERACTION_COLOR)), Qt.BackgroundRole)
+        for t in range(len(types)):
+            self.types.addItem(types[t][0])
+            self.types.setItemData(t + 1, QBrush(QColor(INTERACTION_COLOR)), Qt.BackgroundRole)
         self.types.activated[str].connect(self.item_changed)
+        self.customize_elements()
+
+    def customize_elements(self):
+        interact_css = f"""border: 2px solid {DARK_MAIN_COLOR};
+                                border-radius: 5px;
+                                background: {INTERACTION_COLOR};
+                                padding: 1px 5px 1px 5px;
+                                min-width: 60px;"""
+
+        self.setStyleSheet("QMainWindow {"
+                           f"background: {MAIN_COLOR};"
+                           "}"
+                           "QPushButton {" + interact_css + "}"
+                           "QLineEdit {" + interact_css + "}"
+                           "QDialog { background: " + MAIN_COLOR + "}"
+                           "QComboBox {" + interact_css + "}")
+        self.object_list.setStyleSheet(f"background: {MAIN_COLOR};"
+                                       f"selection-background-color: {SELECTION_COLOR};"
+                                       f"gridline-color: {EXTRA_COLOR}")
+
+        for t in range(self.types.count()):
+            self.types.setItemData(t, QBrush(QColor(INTERACTION_COLOR)), Qt.BackgroundRole)
+
+        self.object_list.horizontalHeader().setStyleSheet(get_header_background(0))
+
+        for t in range(self.types.count()):
+            self.types.setItemData(t, QBrush(QColor(INTERACTION_COLOR)), Qt.BackgroundRole)
 
     def delete_object(self):
         selected = list(set([i.row() for i in self.object_list.selectedItems()]))
@@ -79,22 +110,27 @@ class ObjectList(QMainWindow, Ui_Form):
         search = self.name_search.text().lower()
         if search:
             result = filter(lambda e: search in str(e[1]).lower(), result)
+            self.name_search.setStyleSheet(f"background: {SELECTION_COLOR}")
+        else:
+            self.name_search.setStyleSheet(f"background: {INTERACTION_COLOR}")
         for i, row in enumerate(result):
             self.object_list.setRowCount(i + 1)
-            set_picture_to_table(i, 0, row[0], self.object_list, IMG_SIZE)
+            set_picture_to_table(i, 0, row[0], self.object_list, SHOWING_LIST_IMAGE_SIZE)
             self.object_list.setItem(i, 1, QTableWidgetItem(row[1]))
             self.object_list.setItem(i, 2, QTableWidgetItem(row[2]))
-            self.object_list.setRowHeight(i, IMG_SIZE)
+            set_item_background(self.object_list.item(i, 1), SHOWING_LIST_IMAGE_SIZE)
+            set_item_background(self.object_list.item(i, 2), SHOWING_LIST_IMAGE_SIZE)
+            self.object_list.setRowHeight(i, SHOWING_LIST_IMAGE_SIZE)
 
     def resizeEvent(self, event):
         self.object_list.resize(self.size().width(), self.size().height() - self.object_list.y())
-        self.object_list.setColumnWidth(0, IMG_SIZE)
-        left_size = self.size().width() - IMG_SIZE
+        self.object_list.setColumnWidth(0, SHOWING_LIST_IMAGE_SIZE)
+        left_size = self.size().width() - SHOWING_LIST_IMAGE_SIZE - 23
         for i in range(len(WIDTH_HEADERS)):
             self.object_list.setColumnWidth(i + 1, WIDTH_HEADERS[i] * left_size // 100)
 
     def keyPressEvent(self, event):
-        if event.key() == Qt.Key_F5 or event.key() == Qt.Key_Return:
+        if event.key() == Qt.Key_F5:
             self.update_list()
         elif event.key() == Qt.Key_Delete:
             self.delete_object()

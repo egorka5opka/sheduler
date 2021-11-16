@@ -13,6 +13,9 @@
   <property name="windowTitle">
    <string>Планировщик</string>
   </property>
+  <property name="tabShape">
+   <enum>QTabWidget::Triangular</enum>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QWidget" name="verticalLayoutWidget">
     <property name="geometry">
@@ -259,13 +262,13 @@
      <enum>QAbstractItemView::NoSelection</enum>
     </property>
     <attribute name="horizontalHeaderVisible">
-     <bool>false</bool>
+     <bool>true</bool>
     </attribute>
     <attribute name="horizontalHeaderMinimumSectionSize">
      <number>35</number>
     </attribute>
     <attribute name="verticalHeaderVisible">
-     <bool>false</bool>
+     <bool>true</bool>
     </attribute>
     <attribute name="verticalHeaderMinimumSectionSize">
      <number>35</number>

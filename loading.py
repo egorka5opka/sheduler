@@ -5,6 +5,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication, QLabel, QWidget, QFileDialog, QLineEdit,\
     QMessageBox, QComboBox
 from PyQt5.QtWidgets import QPushButton
+from PyQt5.QtGui import QBrush, QColor
 from PIL import Image
 from PIL.ImageQt import ImageQt
 import sqlite3
@@ -23,7 +24,6 @@ class LoadWidget(QWidget):
         self.setWindowTitle('Создание объекта')
         self.setMinimumSize(self.size())
         self.setMaximumSize(self.size())
-        self.setStyleSheet("background: " + MAIN_COLOR)
 
         self.image_lbl = QLabel(self)
         self.image_lbl.move(10, 10)
@@ -32,62 +32,50 @@ class LoadWidget(QWidget):
         self.load_btn = QPushButton("Загрузить", self)
         self.load_btn.setGeometry(270, 10, 200, 30)
         self.load_btn.clicked.connect(self.load_picture)
-        self.load_btn.setStyleSheet("QPushButton {"
-                                    f"border: 2px solid {DARK_MAIN_COLOR};"
-                                    "border-radius: 5px;"
-                                    f"background: {INTERACTION_COLOR};"
-                                    "}")
 
         self.lbl1 = QLabel("Введите название:", self)
         self.lbl1.setGeometry(270, 50, 200, 20)
         self.name_edit = QLineEdit(self)
         self.name_edit.setGeometry(270, 70, 200, 30)
-        self.name_edit.setStyleSheet("QLineEdit {"
-                                     f"border: 2px solid {DARK_MAIN_COLOR};"
-                                     "border-radius: 5px;"
-                                     f"background: {INTERACTION_COLOR};"
-                                     "}")
 
         self.lbl2 = QLabel("Выберите тип (для сортировки): ", self)
         self.lbl2.setGeometry(270, 110, 200, 20)
         self.types = QComboBox(self)
         self.types.setGeometry(270, 130, 200, 30)
-        self.types.setEditable(True)
         connection = sqlite3.connect("objects_db.db")
         db_cursor = connection.cursor()
         types = db_cursor.execute("SELECT type FROM types").fetchall()
         self.types.addItem("Новый тип")
-        for t in types:
-            self.types.addItem(t[0])
+        for t in range(len(types)):
+            self.types.addItem(types[t][0])
         self.types.activated[str].connect(self.item_changed)
-        self.types.setStyleSheet("QComboBox {"
-                                 f"border: 2px solid {DARK_MAIN_COLOR};"
-                                 "border-radius: 5px;"
-                                 f"background-color: {INTERACTION_COLOR};"
-                                 "}")
-        self.types.setEditable(False)
         self.type = NEW_TYPE
 
         self.lbl3 = QLabel("Введите новый тип:", self)
         self.lbl3.setGeometry(270, 170, 200, 20)
         self.type_edit = QLineEdit(self)
         self.type_edit.setGeometry(270, 190, 200, 30)
-        self.type_edit.setStyleSheet("QLineEdit {"
-                                     f"border: 2px solid {DARK_MAIN_COLOR};"
-                                     "border-radius: 5px;"
-                                     f"background: {INTERACTION_COLOR};"
-                                     "}")
 
         self.save_btn = QPushButton("Сохранить", self)
         self.save_btn.setGeometry(10, 280, 460, 40)
         self.save_btn.clicked.connect(self.save_object)
-        self.save_btn.setStyleSheet("QPushButton {"
-                                    f"border: 2px solid {DARK_MAIN_COLOR};"
-                                    "border-radius: 5px;"
-                                    f"background: {INTERACTION_COLOR};"
-                                    "}")
         self.status_lbl = QLabel(self)
         self.status_lbl.setGeometry(270, 260, 200, 20)
+
+        self.customize_elements()
+
+    def customize_elements(self):
+        interact_css = f"""border: 2px solid {DARK_MAIN_COLOR};
+                           border-radius: 5px;
+                           background: {INTERACTION_COLOR};
+                           padding: 1px 5px 1px 5px;"""
+
+        self.setStyleSheet("QWidget {" + f"background: {MAIN_COLOR};" + "}"
+                           "QPushButton {" + interact_css + "}"
+                           "QLineEdit {" + interact_css + "}"
+                           "QComboBox {" + interact_css + "}")
+        for t in range(self.types.count()):
+            self.types.setItemData(t, QBrush(QColor(INTERACTION_COLOR)), Qt.BackgroundRole)
 
     def load_picture(self):
         fname = QFileDialog.getOpenFileName(self, 'Выбрать картинку', '', "")[0]
@@ -117,6 +105,8 @@ class LoadWidget(QWidget):
             for p in self.parents:
                 if p:
                     p.types.addItem(type)
+                    p.types.setItemData(p.count() - 1, QBrush(QColor(INTERACTION_COLOR)), Qt.BackgroundRole)
+
         elif type == "Все" or type == NEW_TYPE:
             self.status_lbl.setText("Недопустимое название типа")
             return
