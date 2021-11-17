@@ -105,8 +105,7 @@ class LoadWidget(QWidget):
             for p in self.parents:
                 if p:
                     p.types.addItem(type)
-                    p.types.setItemData(p.count() - 1, QBrush(QColor(INTERACTION_COLOR)), Qt.BackgroundRole)
-
+                    p.types.setItemData(p.types.count(), QBrush(QColor(INTERACTION_COLOR)), Qt.BackgroundRole)
         elif type == "Все" or type == NEW_TYPE:
             self.status_lbl.setText("Недопустимое название типа")
             return
@@ -151,10 +150,3 @@ class LoadWidget(QWidget):
         else:
             self.lbl3.setVisible(True)
             self.type_edit.setVisible(True)
-
-
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    ex = LoadWidget()
-    ex.show()
-    sys.exit(app.exec())

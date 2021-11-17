@@ -117,7 +117,6 @@ class Main(QMainWindow, Ui_MainWindow):
 
         for t in range(self.types.count()):
             self.types.setItemData(t, QBrush(QColor(INTERACTION_COLOR)), Qt.BackgroundRole)
-        # self.setWindowFlags(Qt.FramelessWindowHint)
 
     def choose_object(self):
         if self.rubber:
@@ -171,7 +170,6 @@ class Main(QMainWindow, Ui_MainWindow):
         self.cell_size = self.cell_size_edit.value()
         self.flowerbed.setColumnCount(width)
         self.flowerbed.setRowCount(height)
-        self.statusbar.showMessage("")
         for i in range(width):
             self.flowerbed.setColumnWidth(i, self.cell_size)
         for i in range(height):
@@ -239,7 +237,7 @@ class Main(QMainWindow, Ui_MainWindow):
                 else:
                     vert_headers += ["1"]
             self.obj_list.setColumnWidth(0, MAIN_SHOWING_IMAGE_SIZE)
-            left_width = self.verticalLayoutWidget.width() - MAIN_SHOWING_IMAGE_SIZE - 2
+            left_width = self.verticalLayoutWidget.width() - MAIN_SHOWING_IMAGE_SIZE - 22
             self.obj_list.setColumnWidth(1, left_width)
         self.obj_list.setVerticalHeaderLabels(vert_headers)
 

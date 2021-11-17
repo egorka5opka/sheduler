@@ -151,9 +151,3 @@ class ObjectList(QMainWindow, Ui_Form):
         self.connection.commit()
         self.connection.close()
 
-
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    ex = ObjectList()
-    ex.show()
-    sys.exit(app.exec())
