@@ -43,10 +43,8 @@ class Main(QMainWindow, Ui_MainWindow):
         db_cursor = self.connection.cursor()
         types = db_cursor.execute("SELECT type FROM types ORDER BY type").fetchall()
         self.types.addItem("Все")
-        self.types.setItemData(0, QBrush(QColor(INTERACTION_COLOR)), Qt.BackgroundRole)
         for t in range(len(types)):
             self.types.addItem(types[t][0])
-            self.types.setItemData(t + 1, QBrush(QColor(INTERACTION_COLOR)), Qt.BackgroundRole)
         self.types.activated[str].connect(self.item_changed)
 
         self.width_edit.editingFinished.connect(self.rebuild_flowerbed)
@@ -54,7 +52,6 @@ class Main(QMainWindow, Ui_MainWindow):
         self.cell_size_edit.valueChanged.connect(self.rebuild_flowerbed)
         self.obj_list.cellClicked.connect(self.choose_object)
         self.flowerbed.cellClicked.connect(self.choose_cell)
-
         self.update_list()
         self.create_flowerbed()
         self.customize_elements()
@@ -364,8 +361,7 @@ class Main(QMainWindow, Ui_MainWindow):
                 event.ignore()
 
 
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    ex = Main()
-    ex.show()
-    exit(app.exec())
+app = QApplication(sys.argv)
+ex = Main()
+ex.show()
+exit(app.exec())

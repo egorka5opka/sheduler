@@ -1,7 +1,7 @@
 import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidgetItem, QLabel, QMessageBox, QWidget
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QBrush, QColor, QLinearGradient
+from PyQt5.QtGui import QBrush, QColor, QLinearGradient, QIcon
 from showing_form import Ui_Form
 from loading import LoadWidget
 import sqlite3
@@ -72,6 +72,8 @@ class ObjectList(QMainWindow, Ui_Form):
         self.corner_widget = QWidget(self)
         self.corner_widget.resize(20, 20)
         self.corner_widget.setStyleSheet(f"background: {DARK_EXTRA_COLOR}")
+
+        self.setWindowIcon(QIcon("customizing/icon.png"))
 
     def delete_object(self):
         selected = list(set([i.row() for i in self.object_list.selectedItems()]))

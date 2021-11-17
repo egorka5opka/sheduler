@@ -5,7 +5,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication, QLabel, QWidget, QFileDialog, QLineEdit,\
     QMessageBox, QComboBox
 from PyQt5.QtWidgets import QPushButton
-from PyQt5.QtGui import QBrush, QColor
+from PyQt5.QtGui import QBrush, QColor, QIcon
 from PIL import Image
 from PIL.ImageQt import ImageQt
 import sqlite3
@@ -76,6 +76,8 @@ class LoadWidget(QWidget):
                            "QComboBox {" + interact_css + "}")
         for t in range(self.types.count()):
             self.types.setItemData(t, QBrush(QColor(INTERACTION_COLOR)), Qt.BackgroundRole)
+
+        self.setWindowIcon(QIcon("customizing/icon.png"))
 
     def load_picture(self):
         fname = QFileDialog.getOpenFileName(self, 'Выбрать картинку', '', "")[0]
