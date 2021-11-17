@@ -364,4 +364,4 @@ class Main(QMainWindow, Ui_MainWindow):
 app = QApplication(sys.argv)
 ex = Main()
 ex.show()
-exit(app.exec())
+app.exec()
