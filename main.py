@@ -262,7 +262,6 @@ class Main(QMainWindow, Ui_MainWindow):
 
     def create_flowerbed(self):
         if not self.saved:
-            print("asking")
             acception = self.ask_for_saving()
             if acception == QMessageBox.Yes:
                 self.save_flowerbed()
