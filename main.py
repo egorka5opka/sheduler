@@ -15,6 +15,8 @@ class Main(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
+        self.menubar.setMaximumSize(16777215, self.menubar.height())
+        self.menubar.setMinimumSize(0, self.menubar.height())
 
         self.showing = None
         self.connection = sqlite3.connect("objects_db.db")
@@ -108,7 +110,7 @@ class Main(QMainWindow, Ui_MainWindow):
         self.flowerbed.horizontalHeader().setMinimumSize(0, 30)
         self.flowerbed.verticalHeader().setMaximumSize(30, 16777215)
         self.flowerbed.verticalHeader().setMinimumSize(30, 0)
-        self.corner_widget.setGeometry(311, 57,
+        self.corner_widget.setGeometry(311, self.flowerbed.y() + self.menubar.height() + 1,
                                        self.flowerbed.verticalHeader().width(),
                                        self.flowerbed.horizontalHeader().height())
 
@@ -120,17 +122,17 @@ class Main(QMainWindow, Ui_MainWindow):
             self.rubber_click()
         chose = self.obj_list.currentRow()
         if chose == self.selected_obj:
-            self.obj_list.item(chose, 1).setBackground(QColor(MAIN_COLOR))
+            set_item_background(self.obj_list.item(self.selected_obj, 1), MAIN_SHOWING_IMAGE_SIZE)
             self.selected_obj = -1
             return
         if self.obj_list.item(chose, 1).data(Qt.UserRole) == TYPE_ROLE:
             if self.selected_obj != -1:
-                self.obj_list.item(self.selected_obj, 1).setBackground(QColor(MAIN_COLOR))
+                set_item_background(self.obj_list.item(self.selected_obj, 1), MAIN_SHOWING_IMAGE_SIZE)
             self.selected_obj = -1
             return
         self.obj_list.item(chose, 1).setBackground(QColor(SELECTION_COLOR))
         if self.selected_obj != -1:
-            self.obj_list.item(self.selected_obj, 1).setBackground(QColor(MAIN_COLOR))
+            set_item_background(self.obj_list.item(self.selected_obj, 1), MAIN_SHOWING_IMAGE_SIZE)
         self.selected_obj = chose
 
     def text_mode_click(self):
@@ -212,7 +214,6 @@ class Main(QMainWindow, Ui_MainWindow):
                 continue
             i = self.obj_list.rowCount()
             self.obj_list.setRowCount(i + 1)
-            color = QColor(EXTRA_COLOR)
             self.obj_list.setItem(i, 0, QTableWidgetItem())
             type_item = QTableWidgetItem(t)
             type_item.setForeground(QBrush(QColor(Qt.white)))
