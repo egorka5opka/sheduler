@@ -63,7 +63,9 @@ class ObjectList(QMainWindow, Ui_Form):
                            get_horizontal_scroll_bar_style() + get_vertical_scroll_bar_style())
         self.object_list.setStyleSheet(f"background: {MAIN_COLOR};"
                                        f"selection-background-color: {SELECTION_COLOR};"
-                                       f"gridline-color: {EXTRA_COLOR}")
+                                       f"gridline-color: {EXTRA_COLOR};"
+                                       f"color: black;"
+                                       f"font-size: 18px;")
 
         for t in range(self.types.count()):
             self.types.setItemData(t, QBrush(QColor(INTERACTION_COLOR)), Qt.BackgroundRole)
@@ -104,8 +106,8 @@ class ObjectList(QMainWindow, Ui_Form):
         db_cursor = self.connection.cursor()
         query = ""
         if self.current_type == "Все":
-            query = "SELECT objects.id, objects.name, types.type FROM objects\
-             LEFT JOIN types ON objects.type == types.id"
+            query = "SELECT objects.id, objects.name, types.type, objects.height, periods.period FROM objects\
+             LEFT JOIN types ON objects.type == types.id LEFT JOIN periods ON objects.flowering == periods.id"
         else:
             query = f"SELECT objects.id, objects.name, types.type FROM objects\
              LEFT JOIN types ON objects.type == types.id WHERE types.type == '{self.current_type}'"
@@ -119,10 +121,9 @@ class ObjectList(QMainWindow, Ui_Form):
         for i, row in enumerate(result):
             self.object_list.setRowCount(i + 1)
             set_picture_to_table(i, 0, row[0], self.object_list, SHOWING_LIST_IMAGE_SIZE)
-            self.object_list.setItem(i, 1, QTableWidgetItem(row[1]))
-            self.object_list.setItem(i, 2, QTableWidgetItem(row[2]))
-            set_item_background(self.object_list.item(i, 1), SHOWING_LIST_IMAGE_SIZE)
-            set_item_background(self.object_list.item(i, 2), SHOWING_LIST_IMAGE_SIZE)
+            for j in range(len(LIST_HEADERS) - 1):
+                self.object_list.setItem(i, j + 1, QTableWidgetItem(str(row[j + 1])))
+                set_item_background(self.object_list.item(i, j + 1), SHOWING_LIST_IMAGE_SIZE)
             self.object_list.setRowHeight(i, SHOWING_LIST_IMAGE_SIZE)
 
     def resizeEvent(self, event):
@@ -152,4 +153,11 @@ class ObjectList(QMainWindow, Ui_Form):
                 db_cursor.execute(f"DELETE FROM types WHERE id == {t[0]}")
         self.connection.commit()
         self.connection.close()
+
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    ex = ObjectList()
+    ex.show()
+    app.exec()
 

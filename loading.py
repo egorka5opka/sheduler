@@ -48,7 +48,7 @@ class LoadWidget(QWidget):
         self.types.addItem("Новый тип")
         for t in range(len(types)):
             self.types.addItem(types[t][0])
-        self.types.activated[str].connect(self.item_changed)
+        self.types.activated[str].connect(self.type_item_changed)
         self.type = NEW_TYPE
 
         self.lbl3 = QLabel("Введите новый тип:", self)
@@ -56,11 +56,26 @@ class LoadWidget(QWidget):
         self.type_edit = QLineEdit(self)
         self.type_edit.setGeometry(270, 190, 200, 30)
 
+        self.lbl4 = QLabel('Высота (см):', self)
+        self.lbl4.setGeometry(270, 230, 200, 20)
+        self.height_edit = QLineEdit(self)
+        self.height_edit.setGeometry(270, 250, 200, 30)
+
+        self.lbl5 = QLabel('Период цветения:', self)
+        self.lbl5.setGeometry(270, 290, 200, 20)
+        self.period_edit = QComboBox(self)
+        self.period_edit.setGeometry(270, 310, 200, 30)
+        periods = db_cursor.execute("SELECT period from periods").fetchall()
+        for p in periods:
+            self.period_edit.addItem(p[0])
+        self.period_edit.activated[str].connect(self.period_item_changed)
+        self.period = 1
+
         self.save_btn = QPushButton("Сохранить", self)
-        self.save_btn.setGeometry(10, 280, 460, 40)
+        self.save_btn.setGeometry(10, 380, 460, 40)
         self.save_btn.clicked.connect(self.save_object)
         self.status_lbl = QLabel(self)
-        self.status_lbl.setGeometry(270, 260, 200, 20)
+        self.status_lbl.setGeometry(270, 360, 200, 20)
 
         self.customize_elements()
 
@@ -144,7 +159,7 @@ class LoadWidget(QWidget):
         if event.key() == Qt.Key_Return or event.key() == Qt.Key_Enter:
             self.save_object()
 
-    def item_changed(self, text):
+    def type_item_changed(self, text):
         self.type = text
         if text != NEW_TYPE:
             self.lbl3.setVisible(False)
@@ -152,3 +167,14 @@ class LoadWidget(QWidget):
         else:
             self.lbl3.setVisible(True)
             self.type_edit.setVisible(True)
+
+    def period_item_changed(self, text):
+        self.period = text
+
+
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    ex = LoadWidget()
+    ex.show()
+    app.exec()
