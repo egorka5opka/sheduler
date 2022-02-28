@@ -5,12 +5,12 @@ from PyQt5.QtCore import Qt
 from PIL import Image, ImageQt
 
 
-def set_picture_to_table(x, y, n, table, im_size):
+def set_picture_to_table(x, y, n, table, im_size, update=False):
     picture = QTableWidgetItem()
-    if table.item(x, y):
-        img = table.item(x, y).data(Qt.UserRole)[0]
-    else:
+    if update:
         img = Image.open(f"objects/{n}.png")
+    else:
+        img = table.item(x, y).data(Qt.UserRole)[0]
     picture.setData(Qt.UserRole, (img, n))
     img = img.resize((im_size, im_size))
     picture.setBackground(QBrush(QPixmap.fromImage(ImageQt.ImageQt(img))))

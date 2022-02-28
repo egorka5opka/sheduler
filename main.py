@@ -157,7 +157,7 @@ class Main(QMainWindow, Ui_MainWindow):
 
     def set_object(self, x, y, obj):
         self.saved = False
-        set_picture_to_table(x, y, obj, self.flowerbed, self.cell_size)
+        set_picture_to_table(x, y, obj, self.flowerbed, self.cell_size, update=True)
         self.flowerbed.item(x, y).setText("")
         if self.text_mode:
             self.flowerbed.item(x, y).setBackground(QBrush())
@@ -226,7 +226,7 @@ class Main(QMainWindow, Ui_MainWindow):
             for row in result:
                 i = self.obj_list.rowCount()
                 self.obj_list.setRowCount(i + 1)
-                set_picture_to_table(i, 0, row[0], self.obj_list, MAIN_SHOWING_IMAGE_SIZE)
+                set_picture_to_table(i, 0, row[0], self.obj_list, MAIN_SHOWING_IMAGE_SIZE, update=True)
                 self.obj_list.setItem(i, 1, QTableWidgetItem(row[1]))
                 set_item_background(self.obj_list.item(i, 1), MAIN_SHOWING_IMAGE_SIZE)
                 self.obj_list.setRowHeight(i, MAIN_SHOWING_IMAGE_SIZE)

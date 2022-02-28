@@ -116,6 +116,8 @@ class LoadWidget(QWidget):
             return
         name = self.name_edit.text().strip()
         type = self.type
+        height = self.height_edit.text().strip()
+        period = self.period
         if type == NEW_TYPE:
             type = self.type_edit.text().lower().strip()
             type = type[0].upper() + type[1:]
@@ -125,6 +127,9 @@ class LoadWidget(QWidget):
                     p.types.setItemData(p.types.count(), QBrush(QColor(INTERACTION_COLOR)), Qt.BackgroundRole)
         elif type == "Все" or type == NEW_TYPE:
             self.status_lbl.setText("Недопустимое название типа")
+            return
+        if not height.isdigit():
+            self.status_lbl.setText('Недопустимое значение высоты')
             return
         connection = sqlite3.connect("objects_db.db")
         cursor = connection.cursor()
@@ -142,18 +147,20 @@ class LoadWidget(QWidget):
             if acception == QMessageBox.No:
                 connection.close()
                 return
+        period_id = cursor.execute(f"SELECT id from periods WHERE period == '{period}'").fetchone()[0]
         idexec = cursor.execute("SELECT MAX(id) FROM objects").fetchone()
         id = 1
         if idexec[0]:
             id = idexec[0] + 1
-        cursor.execute(f"INSERT INTO objects (id, name, type) VALUES ({id}, '{name}', {type_id})")
+        cursor.execute(f"INSERT INTO objects (id, name, type, height, flowering) VALUES ({id}, '{name}', {type_id}, {int(height)}, {period_id})")
         connection.commit()
         connection.close()
         self.im.save(f"objects/{id}.png")
-        self.close()
         for p in self.parents:
             if p:
                 p.update_list()
+
+        self.close()
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Return or event.key() == Qt.Key_Enter:

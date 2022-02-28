@@ -20,6 +20,7 @@ class ObjectList(QMainWindow, Ui_Form):
         self.lbl.setGeometry(20, 200, 100, 100)
 
         self.current_type = "Все"
+        self.period = 'Все'
 
         self.object_list.setColumnCount(len(LIST_HEADERS))
         self.object_list.setHorizontalHeaderLabels(LIST_HEADERS)
@@ -29,12 +30,15 @@ class ObjectList(QMainWindow, Ui_Form):
         self.connection = sqlite3.connect("objects_db.db")
 
         self.update_list()
+
         self.update_btn.clicked.connect(self.update_list)
         self.update_btn.setToolTip("F5")
 
         self.delete_btn.clicked.connect(self.delete_object)
         self.delete_btn.setToolTip("Delete")
         self.name_search.textEdited.connect(self.update_list)
+        self.min_height_box.valueChanged.connect(self.update_list)
+        self.max_height_box.valueChanged.connect(self.update_list)
 
         db_cursor = self.connection.cursor()
         types = db_cursor.execute("SELECT type FROM types ORDER BY type").fetchall()
@@ -44,6 +48,15 @@ class ObjectList(QMainWindow, Ui_Form):
             self.types.addItem(types[t][0])
             self.types.setItemData(t + 1, QBrush(QColor(INTERACTION_COLOR)), Qt.BackgroundRole)
         self.types.activated[str].connect(self.item_changed)
+
+        periods = db_cursor.execute("SELECT period from periods").fetchall()
+        self.period_edit.addItem("Все")
+        self.period_edit.setItemData(0, QBrush(QColor(INTERACTION_COLOR)), Qt.BackgroundRole)
+        for p in range(len(periods)):
+            self.period_edit.addItem(periods[p][0])
+            self.period_edit.setItemData(p + 1, QBrush(QColor(INTERACTION_COLOR)), Qt.BackgroundRole)
+        self.period_edit.activated[str].connect(self.period_item_changed)
+
         self.customize_elements()
 
     def customize_elements(self):
@@ -60,7 +73,13 @@ class ObjectList(QMainWindow, Ui_Form):
                            "QLineEdit {" + interact_css + "}"
                            "QDialog { background: " + MAIN_COLOR + "}"
                            "QComboBox {" + interact_css + "} " +
-                           get_horizontal_scroll_bar_style() + get_vertical_scroll_bar_style())
+                           get_horizontal_scroll_bar_style() + get_vertical_scroll_bar_style() +
+                           "QSpinBox {"
+                           f"background: {INTERACTION_COLOR};"
+                           "padding-right: 15px;"
+                           f"border: 3px solid {DARK_MAIN_COLOR};"
+                           "border-radius: 5px"
+                           "}")
         self.object_list.setStyleSheet(f"background: {MAIN_COLOR};"
                                        f"selection-background-color: {SELECTION_COLOR};"
                                        f"gridline-color: {EXTRA_COLOR};"
@@ -104,13 +123,13 @@ class ObjectList(QMainWindow, Ui_Form):
 
     def update_list(self):
         db_cursor = self.connection.cursor()
-        query = ""
-        if self.current_type == "Все":
-            query = "SELECT objects.id, objects.name, types.type, objects.height, periods.period FROM objects\
-             LEFT JOIN types ON objects.type == types.id LEFT JOIN periods ON objects.flowering == periods.id"
-        else:
-            query = f"SELECT objects.id, objects.name, types.type FROM objects\
-             LEFT JOIN types ON objects.type == types.id WHERE types.type == '{self.current_type}'"
+        query = f"SELECT objects.id, objects.name, types.type, objects.height, periods.period FROM objects\
+             LEFT JOIN types ON objects.type == types.id LEFT JOIN periods ON objects.flowering == periods.id \
+             WHERE {self.min_height_box.value()} <= objects.height AND objects.height <= {self.max_height_box.value()}"
+        if self.current_type != 'Все':
+            query += f" AND objects.type in (SELECT types.id FROM types WHERE types.type == '{self.current_type}')"
+        if self.period != 'Все':
+            query += f" AND objects.flowering in (SELECT id FROM periods WHERE period == '{self.period}')"
         result = db_cursor.execute(query).fetchall()
         search = self.name_search.text().lower()
         if search:
@@ -118,9 +137,10 @@ class ObjectList(QMainWindow, Ui_Form):
             self.name_search.setStyleSheet(f"background: {SELECTION_COLOR}")
         else:
             self.name_search.setStyleSheet(f"background: {INTERACTION_COLOR}")
+        self.object_list.setRowCount(0)
         for i, row in enumerate(result):
             self.object_list.setRowCount(i + 1)
-            set_picture_to_table(i, 0, row[0], self.object_list, SHOWING_LIST_IMAGE_SIZE)
+            set_picture_to_table(i, 0, row[0], self.object_list, SHOWING_LIST_IMAGE_SIZE, update=True)
             for j in range(len(LIST_HEADERS) - 1):
                 self.object_list.setItem(i, j + 1, QTableWidgetItem(str(row[j + 1])))
                 set_item_background(self.object_list.item(i, j + 1), SHOWING_LIST_IMAGE_SIZE)
@@ -142,6 +162,10 @@ class ObjectList(QMainWindow, Ui_Form):
 
     def item_changed(self, text):
         self.current_type = text
+        self.update_list()
+
+    def period_item_changed(self, text):
+        self.period = text
         self.update_list()
 
     def closeEvent(self, event):
