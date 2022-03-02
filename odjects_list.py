@@ -83,8 +83,10 @@ class ObjectList(QMainWindow, Ui_Form):
         self.object_list.setStyleSheet(f"background: {MAIN_COLOR};"
                                        f"selection-background-color: {SELECTION_COLOR};"
                                        f"gridline-color: {EXTRA_COLOR};"
-                                       f"color: black;"
-                                       f"font-size: 18px;")
+                                       "color: black;"
+                                       "font-size: 18px;"
+                                       "font-weight: bold;"
+                                       "text-align: center;")
 
         for t in range(self.types.count()):
             self.types.setItemData(t, QBrush(QColor(INTERACTION_COLOR)), Qt.BackgroundRole)

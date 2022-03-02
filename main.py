@@ -49,11 +49,22 @@ class Main(QMainWindow, Ui_MainWindow):
             self.types.addItem(types[t][0])
         self.types.activated[str].connect(self.item_changed)
 
+        periods = db_cursor.execute("SELECT period from periods").fetchall()
+        self.period_edit.addItem("Все")
+        self.period_edit.setItemData(0, QBrush(QColor(INTERACTION_COLOR)), Qt.BackgroundRole)
+        for p in range(len(periods)):
+            self.period_edit.addItem(periods[p][0])
+            self.period_edit.setItemData(p + 1, QBrush(QColor(INTERACTION_COLOR)), Qt.BackgroundRole)
+        self.period_edit.activated[str].connect(self.period_item_changed)
+        self.period = 'Все'
+
         self.width_edit.editingFinished.connect(self.rebuild_flowerbed)
         self.height_edit.editingFinished.connect(self.rebuild_flowerbed)
         self.cell_size_edit.valueChanged.connect(self.rebuild_flowerbed)
         self.obj_list.cellClicked.connect(self.choose_object)
         self.flowerbed.cellClicked.connect(self.choose_cell)
+        self.min_height_box.valueChanged.connect(self.update_list)
+        self.max_height_box.valueChanged.connect(self.update_list)
         self.update_list()
         self.create_flowerbed()
         self.customize_elements()
@@ -204,8 +215,14 @@ class Main(QMainWindow, Ui_MainWindow):
             in_types = [self.current_type]
         vert_headers = []
         for t in in_types:
-            query = f"SELECT objects.id, objects.name, types.type FROM objects LEFT JOIN types ON" \
-                    f" types.id == objects.type WHERE types.type == '{t}' ORDER BY objects.name"
+            query = f"SELECT objects.id, objects.name, types.type, objects.height, periods.period FROM objects\
+                      LEFT JOIN types ON objects.type == types.id LEFT JOIN periods ON objects.flowering == periods.id \
+                      WHERE {self.min_height_box.value()} <= objects.height AND objects.height <= {self.max_height_box.value()}\
+                       AND types.type == '{t}'"
+            if self.current_type != 'Все':
+                query += f" AND objects.type in (SELECT types.id FROM types WHERE types.type == '{self.current_type}')"
+            if self.period != 'Все':
+                query += f" AND objects.flowering in (SELECT id FROM periods WHERE period == '{self.period}')"
             result = list(db_cursor.execute(query).fetchall())
             search = self.name_search.text().lower()
             if search:
@@ -360,6 +377,10 @@ class Main(QMainWindow, Ui_MainWindow):
                 event.accept()
             else:
                 event.ignore()
+
+    def period_item_changed(self, text):
+        self.period = text
+        self.update_list()
 
 
 app = QApplication(sys.argv)
